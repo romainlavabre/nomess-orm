@@ -6,10 +6,11 @@ namespace Nwsorm\QueryWriter\Mysql;
 
 use Nwsorm\Cache\CacheHandlerInterface;
 use Nwsorm\Driver\DriverHandlerInterface;
+use Nwsorm\QueryWriter\QueryUpdateInterface;
 use Nwsorm\Store;
 use PDOStatement;
 
-class UpdateQuery extends AbstractAlterData
+class UpdateQuery extends AbstractAlterData implements QueryUpdateInterface
 {
     
     private const QUERY_UPDATE = 'UPDATE ';
