@@ -76,4 +76,31 @@ interface CacheHandlerInterface
      * @return array
      */
     public function getCreateMetadataQuery( string $classname ): array;
+    
+    
+    /**
+     * Return true if query is cached
+     *
+     * @param string $classname
+     * @return bool
+     */
+    public function hasUpdateQuery( string $classname ): bool;
+    
+    
+    /**
+     * Return query
+     *
+     * @param string $classname
+     * @return string
+     */
+    public function getUpdateQuery( string $classname ): string;
+    
+    
+    /**
+     * Return metadata's query
+     *
+     * @param string $classname
+     * @return array
+     */
+    public function getUpdateMetadataQuery( string $classname ): array;
 }

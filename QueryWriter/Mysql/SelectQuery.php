@@ -23,6 +23,7 @@ class SelectQuery implements QuerySelectInterface
     private const QUERY_JOIN    = ' LEFT JOIN ';
     private const QUERY_ON      = ' ON ';
     private const QUERY_WHERE   = ' WHERE ';
+    private const QUERY_EQUAL   = ' = ';
     private CacheHandlerInterface  $cacheHandler;
     private DriverHandlerInterface $driverHandler;
     private array                  $relationFollowed = array();
@@ -163,15 +164,14 @@ class SelectQuery implements QuerySelectInterface
                     )
                     ) . self::QUERY_ON .
                          $relation[self::CACHE_HOLDER][CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_PREFIX] . '' .
-                         $relation[self::CACHE_HOLDER][CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME] . '_id = ' .
+                         $relation[self::CACHE_HOLDER][CacheHandlerInterface::ENTITY_METADATA]['id'][CacheHandlerInterface::ENTITY_COLUMN] . self::QUERY_EQUAL .
                          $this->getPrefixRelTable( $relTableName ) . '.' .
-                         $relation[self::CACHE_TARGET][CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_PREFIX] . '' .
-                         $relation[self::CACHE_TARGET][CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME] . '_id';
+                         $relation[self::CACHE_HOLDER][CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME] . '_id';
             }
             
             $line .= self::QUERY_JOIN .
-                     $relation[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME] . ' ' .
-                     $relation[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_PREFIX] . self::QUERY_ON .
+                     $relation[self::CACHE_TARGET][CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME] . ' ' .
+                     $relation[self::CACHE_TARGET][CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_PREFIX] . self::QUERY_ON .
                      $this->queryJoinCondition( $relation );
         }
         
@@ -188,28 +188,34 @@ class SelectQuery implements QuerySelectInterface
      */
     private function queryJoinCondition( array $cache ): string
     {
-        $relationType = $cache[self::RELATION_TYPE];
+        // Define short variable for visibility
+        $relationType      = $cache[self::RELATION_TYPE];
+        $nameTableHolder   = $cache[self::CACHE_HOLDER][CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME];
+        $prefixTableHolder = $cache[self::CACHE_HOLDER][CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_PREFIX];
+        $nameTableTarget   = $cache[self::CACHE_TARGET][CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME];
+        $prefixTableTarget = $cache[self::CACHE_TARGET][CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_PREFIX];
+        $columnIdHolder    = $cache[self::CACHE_HOLDER][CacheHandlerInterface::ENTITY_METADATA]['id'][CacheHandlerInterface::ENTITY_COLUMN];
+        $columnIdTarget    = $cache[self::CACHE_TARGET][CacheHandlerInterface::ENTITY_METADATA]['id'][CacheHandlerInterface::ENTITY_COLUMN];
         
         if( $relationType === 'OneToMany' || $relationType === 'OneToOne' ) {
-            return $cache[self::CACHE_TARGET][CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME] . '_id = ' .
-                   $cache[self::RELATED];
+            // ON PTarget.id = PHolder.target_id
+            return $prefixTableTarget . '.' . $columnIdTarget . self::QUERY_EQUAL . $cache[self::RELATED];
         } elseif( $relationType === 'ManyToOne' ) {
-            return $cache[self::CACHE_HOLDER][CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME] . '_id = ' .
-                   $cache[self::CACHE_TARGET][CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_PREFIX] . '.' .
-                   $cache[self::CACHE_HOLDER][CacheHandlerInterface::TABLE_NAME] . '_id';
+            // ON PHolder.id =  PTarget.THolder_id
+            return $prefixTableHolder . '.' . $columnIdHolder . self::QUERY_EQUAL . $prefixTableTarget . '.' . $nameTableHolder . '_id';
         } elseif( $relationType === 'ManyToMany' ) {
-            $relTableName = $this->getManyToManyTableName(
-                $cache[self::CACHE_TARGET][CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME],
-                $cache[self::CACHE_HOLDER][CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME]
+            $nameTablePivot   = $this->getManyToManyTableName(
+                $nameTableTarget,
+                $nameTableHolder
             );
+            $prefixTablePivot = $this->getPrefixRelTable( $nameTablePivot );
             
-            return $cache[self::CACHE_TARGET][CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_PREFIX] . '.' .
-                   $cache[self::CACHE_TARGET][CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME] . ' = ' .
-                   $this->getPrefixRelTable( $relTableName ) . '.' . $cache[self::CACHE_TARGET][CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME] . '_id';
+            // ON PTarget.id = PPivot.TTarget_id
+            return $prefixTableTarget . '.' . $columnIdTarget . self::QUERY_EQUAL . $prefixTablePivot . '.' . $nameTableTarget . '_id';
         }
         
-        throw new ORMException( 'An error occurred: the type of relation for table' . $cache[self::CACHE_TARGET][CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME] .
-                                ' and ' . $cache[self::CACHE_HOLDER][CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME] . ' not found' );
+        throw new ORMException( 'An error occurred: the type of relation for table' . $nameTableTarget .
+                                ' and ' . $nameTableHolder . ' not found' );
     }
     
     
