@@ -6,6 +6,8 @@ interface CacheHandlerInterface
 {
     
     public const ENTITY_METADATA           = 'entity_metadata';
+    public const ENTITY_TYPE               = 'entity_type';
+    public const ENTITY_NULLABLE           = 'entity_nullable';
     public const ENTITY_COLUMN             = 'entity_column';
     public const ENTITY_RELATION           = 'entity_relation';
     public const ENTITY_RELATION_CLASSNAME = 'entity_relation_classname';
@@ -103,4 +105,31 @@ interface CacheHandlerInterface
      * @return array
      */
     public function getUpdateMetadataQuery( string $classname ): array;
+    
+    
+    /**
+     * Return true if query is cached
+     *
+     * @param string $classname
+     * @return bool
+     */
+    public function hasDeleteQuery( string $classname ): bool;
+    
+    
+    /**
+     * Return query
+     *
+     * @param string $classname
+     * @return string
+     */
+    public function getDeleteQuery( string $classname ): string;
+    
+    
+    /**
+     * Return metadata's query
+     *
+     * @param string $classname
+     * @return array
+     */
+    public function getDeleteMetadataQuery( string $classname ): array;
 }
