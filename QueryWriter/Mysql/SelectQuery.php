@@ -51,6 +51,29 @@ class SelectQuery implements QuerySelectInterface
     {
         $cache = $this->cacheHandler->getCache( $classname );
         
+        $query = self::QUERY_SELECT . '*' .
+                 $this->queryPartTableTarget( $cache ) .
+                 $this->queryWhereClause( $idOrSql, $parameters, $cache ) . ';';
+        
+        $statement = $this->driverHandler->getConnection()->prepare( $query );
+        
+        $this->bindValue( $statement );
+        
+        return $statement;
+    }
+    
+    
+    /**
+     * @param string $classname
+     * @param $idOrSql
+     * @param array $parameters
+     * @return PDOStatement
+     * @throws ORMException
+     */
+    public function getQuery2( string $classname, $idOrSql, array $parameters ): PDOStatement
+    {
+        $cache = $this->cacheHandler->getCache( $classname );
+        
         if( $this->cacheHandler->hasSelectQuery( $classname ) ) {
             $this->query_metadata = $this->cacheHandler->getSelectMetadataQuery( $classname );
             $statement            = $this->driverHandler->getConnection()

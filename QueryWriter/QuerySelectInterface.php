@@ -10,8 +10,9 @@ use PDOStatement;
 interface QuerySelectInterface
 {
     
-    public const TABLES    = 'tables';
-    public const CATCHABLE = 'catchable';
+    public const TABLES                      = 'tables';
+    public const CATCHABLE                   = 'catchable';
+    public const META_MAPPING_PREF_CLASSNAME = 'mapping_pref_classname';
     
     
     /**
