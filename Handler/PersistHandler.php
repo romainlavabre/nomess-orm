@@ -1,10 +1,10 @@
 <?php
 
 
-namespace Nwsorm\Handler;
+namespace Newwebsouth\Orm\Handler;
 
 
-use Nwsorm\Store;
+use Newwebsouth\Orm\Store;
 use ReflectionException;
 
 class PersistHandler implements PersistHandlerInterface

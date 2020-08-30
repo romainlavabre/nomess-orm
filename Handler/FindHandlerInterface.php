@@ -1,10 +1,10 @@
 <?php
 
 
-namespace Nwsorm\Handler;
+namespace Newwebsouth\Orm\Handler;
 
 
-use Nwsorm\Exception\ORMException;
+use Newwebsouth\Orm\Exception\ORMException;
 
 interface FindHandlerInterface
 {

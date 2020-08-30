@@ -1,13 +1,13 @@
 <?php
 
 
-namespace Nwsorm\Handler;
+namespace Newwebsouth\Orm\Handler;
 
 
-use Nwsorm\Cache\CacheHandlerInterface;
-use Nwsorm\QueryWriter\QueryFreeInterface;
-use Nwsorm\QueryWriter\QuerySelectInterface;
-use Nwsorm\Store;
+use Newwebsouth\Orm\Cache\CacheHandlerInterface;
+use Newwebsouth\Orm\QueryWriter\QueryFreeInterface;
+use Newwebsouth\Orm\QueryWriter\QuerySelectInterface;
+use Newwebsouth\Orm\Store;
 use PDOStatement;
 
 class FindHandler implements FindHandlerInterface

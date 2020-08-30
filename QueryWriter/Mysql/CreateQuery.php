@@ -1,10 +1,10 @@
 <?php
 
-namespace Nwsorm\QueryWriter\Mysql;
+namespace Newwebsouth\Orm\QueryWriter\Mysql;
 
-use Nwsorm\Cache\CacheHandlerInterface;
-use Nwsorm\Driver\DriverHandlerInterface;
-use Nwsorm\QueryWriter\QueryCreateInterface;
+use Newwebsouth\Orm\Cache\CacheHandlerInterface;
+use Newwebsouth\Orm\Driver\DriverHandlerInterface;
+use Newwebsouth\Orm\QueryWriter\QueryCreateInterface;
 use PDOStatement;
 
 /**

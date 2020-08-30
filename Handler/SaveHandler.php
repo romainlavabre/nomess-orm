@@ -1,16 +1,16 @@
 <?php
 
 
-namespace Nwsorm\Handler;
+namespace Newwebsouth\Orm\Handler;
 
 
-use Nwsorm\Driver\DriverHandlerInterface;
-use Nwsorm\Handler\Dispatcher\DispatcherHandler;
-use Nwsorm\QueryWriter\QueryCreateInterface;
-use Nwsorm\QueryWriter\QueryDeleteInterface;
-use Nwsorm\QueryWriter\QueryJoinInterface;
-use Nwsorm\QueryWriter\QueryUpdateInterface;
-use Nwsorm\Store;
+use Newwebsouth\Orm\Driver\DriverHandlerInterface;
+use Newwebsouth\Orm\Handler\Dispatcher\DispatcherHandler;
+use Newwebsouth\Orm\QueryWriter\QueryCreateInterface;
+use Newwebsouth\Orm\QueryWriter\QueryDeleteInterface;
+use Newwebsouth\Orm\QueryWriter\QueryJoinInterface;
+use Newwebsouth\Orm\QueryWriter\QueryUpdateInterface;
+use Newwebsouth\Orm\Store;
 
 class SaveHandler implements SaveHandlerInterface
 {

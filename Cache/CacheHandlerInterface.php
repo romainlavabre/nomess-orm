@@ -1,6 +1,6 @@
 <?php
 
-namespace Nwsorm\Cache;
+namespace Newwebsouth\Orm\Cache;
 
 interface CacheHandlerInterface
 {
@@ -8,6 +8,7 @@ interface CacheHandlerInterface
     public const ENTITY_METADATA            = 'entity_metadata';
     public const ENTITY_TYPE                = 'entity_type';
     public const ENTITY_COLUMN              = 'entity_column';
+    public const ENTITY_IS_NULLABLE         = 'entity_is_nullable';
     public const ENTITY_RELATION            = 'entity_relation';
     public const ENTITY_RELATION_CLASSNAME  = 'entity_relation_classname';
     public const ENTITY_RELATION_TYPE       = 'entity_relation_type';

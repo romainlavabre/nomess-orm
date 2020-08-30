@@ -1,11 +1,11 @@
 <?php
 
 
-namespace Nwsorm\QueryWriter\Mysql;
+namespace Newwebsouth\Orm\QueryWriter\Mysql;
 
 
-use Nwsorm\Driver\DriverHandlerInterface;
-use Nwsorm\QueryWriter\QueryFreeInterface;
+use Newwebsouth\Orm\Driver\DriverHandlerInterface;
+use Newwebsouth\Orm\QueryWriter\QueryFreeInterface;
 
 class FreeQuery implements QueryFreeInterface
 {

@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Nwsorm\QueryWriter;
+namespace Newwebsouth\Orm\QueryWriter;
 
 
 interface QueryCreateInterface

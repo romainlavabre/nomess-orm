@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Nwsorm\Handler;
+namespace Newwebsouth\Orm\Handler;
 
 
 interface SaveHandlerInterface

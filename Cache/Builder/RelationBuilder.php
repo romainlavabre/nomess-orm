@@ -1,11 +1,11 @@
 <?php
 
 
-namespace Nwsorm\Cache\Builder;
+namespace Newwebsouth\Orm\Cache\Builder;
 
 
-use Nwsorm\Annotation\AnnotationParserInterface;
-use Nwsorm\Exception\ORMException;
+use Newwebsouth\Orm\Annotation\AnnotationParserInterface;
+use Newwebsouth\Orm\Exception\ORMException;
 
 class RelationBuilder
 {

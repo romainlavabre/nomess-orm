@@ -1,11 +1,11 @@
 <?php
 
 
-namespace Nwsorm\Handler\Dispatcher;
+namespace Newwebsouth\Orm\Handler\Dispatcher;
 
 
-use Nwsorm\Cache\CacheHandlerInterface;
-use Nwsorm\Store;
+use Newwebsouth\Orm\Cache\CacheHandlerInterface;
+use Newwebsouth\Orm\Store;
 
 /**
  * This class reorganize the object that must be created and updated:

@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Nwsorm;
+namespace Newwebsouth\Orm;
 
 
 interface EntityManagerInterface

@@ -1,13 +1,13 @@
 <?php
 
 
-namespace Nwsorm\QueryWriter\Mysql;
+namespace Newwebsouth\Orm\QueryWriter\Mysql;
 
 
-use Nwsorm\Cache\CacheHandlerInterface;
-use Nwsorm\Driver\DriverHandlerInterface;
-use Nwsorm\QueryWriter\QueryUpdateInterface;
-use Nwsorm\Store;
+use Newwebsouth\Orm\Cache\CacheHandlerInterface;
+use Newwebsouth\Orm\Driver\DriverHandlerInterface;
+use Newwebsouth\Orm\QueryWriter\QueryUpdateInterface;
+use Newwebsouth\Orm\Store;
 use PDOStatement;
 
 class UpdateQuery extends AbstractAlterData implements QueryUpdateInterface

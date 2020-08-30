@@ -2,11 +2,11 @@
 /** @noinspection PhpUndefinedConstantInspection */
 
 
-namespace Nwsorm\Driver\Pdo;
+namespace Newwebsouth\Orm\Driver\Pdo;
 
 
-use Nwsorm\Driver\DriverHandlerInterface;
-use Nwsorm\Driver\Instance;
+use Newwebsouth\Orm\Driver\DriverHandlerInterface;
+use Newwebsouth\Orm\Driver\Instance;
 
 class PdoDriver implements DriverHandlerInterface
 {

@@ -1,13 +1,13 @@
 <?php
 
 
-namespace Nwsorm\QueryWriter\Mysql;
+namespace Newwebsouth\Orm\QueryWriter\Mysql;
 
 
-use Nwsorm\Cache\CacheHandlerInterface;
-use Nwsorm\Driver\DriverHandlerInterface;
-use Nwsorm\QueryWriter\QueryDeleteInterface;
-use Nwsorm\Store;
+use Newwebsouth\Orm\Cache\CacheHandlerInterface;
+use Newwebsouth\Orm\Driver\DriverHandlerInterface;
+use Newwebsouth\Orm\QueryWriter\QueryDeleteInterface;
+use Newwebsouth\Orm\Store;
 
 class DeleteQuery implements QueryDeleteInterface
 {

@@ -2,10 +2,10 @@
 /** @noinspection PhpUndefinedConstantInspection */
 
 
-namespace Nwsorm\Cache\Builder;
+namespace Newwebsouth\Orm\Cache\Builder;
 
 
-use Nwsorm\Cache\CacheHandlerInterface;
+use Newwebsouth\Orm\Cache\CacheHandlerInterface;
 
 class CacheBuilder
 {

@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Nwsorm\Driver;
+namespace Newwebsouth\Orm\Driver;
 
 
 class Instance

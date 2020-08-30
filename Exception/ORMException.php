@@ -1,6 +1,6 @@
 <?php
 
-namespace Nwsorm\Exception;
+namespace Newwebsouth\Orm\Exception;
 
 use Exception;
 
