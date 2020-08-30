@@ -8,6 +8,7 @@ use Nwsorm\Driver\DriverHandlerInterface;
 use Nwsorm\Handler\Dispatcher\DispatcherHandler;
 use Nwsorm\QueryWriter\QueryCreateInterface;
 use Nwsorm\QueryWriter\QueryDeleteInterface;
+use Nwsorm\QueryWriter\QueryJoinInterface;
 use Nwsorm\QueryWriter\QueryUpdateInterface;
 use Nwsorm\Store;
 
@@ -19,6 +20,8 @@ class SaveHandler implements SaveHandlerInterface
     private QueryCreateInterface   $queryCreate;
     private QueryUpdateInterface   $queryUpdate;
     private QueryDeleteInterface   $queryDelete;
+    private QueryJoinInterface     $queryJoin;
+    private array                  $toJoin = array();
     
     
     public function __construct(
@@ -26,13 +29,15 @@ class SaveHandler implements SaveHandlerInterface
         DriverHandlerInterface $driverHandler,
         QueryCreateInterface $queryCreate,
         QueryUpdateInterface $queryUpdate,
-        QueryDeleteInterface $queryDelete )
+        QueryDeleteInterface $queryDelete,
+        QueryJoinInterface $queryJoin )
     {
         $this->dispatcher    = $dispatcher;
         $this->driverHandler = $driverHandler;
         $this->queryCreate   = $queryCreate;
         $this->queryUpdate   = $queryUpdate;
         $this->queryDelete   = $queryDelete;
+        $this->queryJoin     = $queryJoin;
     }
     
     
@@ -68,13 +73,17 @@ class SaveHandler implements SaveHandlerInterface
                 }
             }
             
+            foreach( $this->toJoin as $object ) {
+                $this->queryJoin->getQuery( $object )->execute();
+            }
+            
             
             $connection->commit();
-            $connection = NULL;
             
             Store::resetDeleteRepository();
             Store::resetCreateRepository();
             Store::resetUpdateRepository();
+            $this->toJoin = array();
         } catch( \Throwable $th ) {
             $connection->rollBack();
             
@@ -82,5 +91,13 @@ class SaveHandler implements SaveHandlerInterface
         }
         
         return TRUE;
+    }
+    
+    
+    private function setToJoin( object $object ): void
+    {
+        if( !in_array( $object, $this->toJoin ) ) {
+            $this->toJoin[] = $object;
+        }
     }
 }
