@@ -16,20 +16,10 @@ class DeleteQuery implements QueryDeleteInterface
     private const QUERY_WHERE  = ' WHERE ';
     private CacheHandlerInterface  $cacheHandler;
     private DriverHandlerInterface $driverHandler;
-    private array                  $query_metadata = array();
     
     
     public function getQuery( string $classname, object $object ): \PDOStatement
     {
-        if( $this->cacheHandler->hasDeleteQuery( $classname ) ) {
-            $statement = $this->driverHandler->getConnection()->prepare(
-                $this->cacheHandler->getDeleteQuery( $classname ) . $this->queryWhere( $object ) . ';'
-            );
-            
-            $this->query_metadata = $this->cacheHandler->getDeleteMetadataQuery( $classname );
-            
-            return $statement;
-        }
         
         $cache = $this->cacheHandler->getCache( $classname );
         
@@ -52,11 +42,5 @@ class DeleteQuery implements QueryDeleteInterface
         $id = Store::getReflection( get_class( $object ), 'id' )->getValue( $object );
         
         return 'id = ' . $id;
-    }
-    
-    
-    public function getQueryMetadata(): array
-    {
-        return $this->query_metadata;
     }
 }

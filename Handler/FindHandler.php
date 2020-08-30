@@ -8,6 +8,7 @@ use Nwsorm\Cache\CacheHandlerInterface;
 use Nwsorm\QueryWriter\QueryFreeInterface;
 use Nwsorm\QueryWriter\QuerySelectInterface;
 use Nwsorm\Store;
+use PDOStatement;
 
 class FindHandler implements FindHandlerInterface
 {
@@ -38,21 +39,21 @@ class FindHandler implements FindHandlerInterface
                 return Store::getOfRepository( $classname, $idOrSql );
             }
         }
-        // TODO remonter le block statement et target obligatoire, foreach et retour du tableau/object/null
-        // TODO modifier QuerySelect
-        // TODO Cache builder
-        // TODO Analize et modif BDD
+        
+        $statement = $this->querySelect->getQuery( $classname, $idOrSql, $parameters );
+        $statement->execute();
+        
+        foreach( $data = $statement->fetchAll( \PDO::FETCH_CLASS, $classname ) as $object ) {
+            $this->execute( $classname, $object );
+        }
+        
+        return $this->returnData( $idOrSql, $data );
     }
     
     
-    private function execute( string $classname, $idOrSql, array $parameters = NULL, object $target = NULL )
+    private function execute( string $classname, object $target ): void
     {
         $cache = $this->cacheHandler->getCache( $classname );
-        
-        if( $target === NULL ) {
-            $statement = $this->querySelect->getQuery( $classname, $idOrSql, $parameters );
-            $target    = $statement->execute();
-        }
         
         foreach( $cache[CacheHandlerInterface::ENTITY_METADATA] as $propertyName => $array ) {
             if( $array[CacheHandlerInterface::ENTITY_RELATION] !== NULL ) {
@@ -67,12 +68,10 @@ class FindHandler implements FindHandlerInterface
                 $this->fill( $array[CacheHandlerInterface::ENTITY_RELATION_CLASSNAME], $statement, $target, $propertyName );
             }
         }
-        
-        return $target;
     }
     
     
-    private function fill( string $classname, \PDOStatement $statement, object $object, string $propertyName ): void
+    private function fill( string $classname, PDOStatement $statement, object $object, string $propertyName ): void
     {
         $statement->execute();
         $result             = $statement->fetchAll( \PDO::FETCH_CLASS, $classname );
@@ -89,7 +88,7 @@ class FindHandler implements FindHandlerInterface
         }
         
         foreach( $result as $object ) {
-            $this->execute( $classname, NULL, NULL, $object );
+            $this->execute( $classname, $object );
         }
     }
     
@@ -119,5 +118,26 @@ class FindHandler implements FindHandlerInterface
     private function getQueryTable( array $cache ): string
     {
         return $cache[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME];
+    }
+    
+    
+    /**
+     * @param $idOrSql
+     * @param $data
+     * @return object|array|null
+     */
+    private function returnData( $idOrSql, $data )
+    {
+        
+        if( empty( $data ) ) {
+            return NULL;
+        }
+        
+        if( preg_match( '/[0-9]+/', $idOrSql ) ) {
+            
+            return $data[0];
+        }
+        
+        return $data;
     }
 }

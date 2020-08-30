@@ -1,4 +1,5 @@
 <?php
+/** @noinspection PhpUndefinedConstantInspection */
 
 
 namespace Nwsorm\Cache\Builder;
@@ -9,24 +10,39 @@ use Nwsorm\Cache\CacheHandlerInterface;
 class CacheBuilder
 {
     
-    private TypeBuilder $typeBuilder;
-    private array       $cache = array();
+    private EntityBuilder $entityBuilder;
+    private TableBuilder  $tableBuilder;
+    private array         $cache = array();
     
     
-    public function getCache( string $classname ): array
+    public function __construct( EntityBuilder $entityBuilder, TableBuilder $tableBuilder )
     {
-        $reflectionProperties = ( new \ReflectionClass( $classname ) )->getProperties();
-        
-        foreach( $reflectionProperties as $reflectionProperty ) {
-            $this->cache[$reflectionProperty->getName()][CacheHandlerInterface::ENTITY_METADATA] = [
-            
-            ];
-        }
+        $this->entityBuilder = $entityBuilder;
+        $this->tableBuilder  = $tableBuilder;
     }
     
     
-    private function write(): void
+    public function buildCache( string $classname ): array
     {
-    
+        $reflectionProperties = ( $reflectionClass = new \ReflectionClass( $classname ) )->getProperties();
+        
+        $this->cache[CacheHandlerInterface::TABLE_METADATA] = [
+            CacheHandlerInterface::TABLE_NAME => $this->tableBuilder->setReflectionClass( $reflectionClass )->getTable()
+        ];
+        
+        foreach( $reflectionProperties as $reflectionProperty ) {
+            $this->entityBuilder->setReflectionProperty( $reflectionProperty );
+            
+            if( $this->entityBuilder->isValidProperty() ) {
+                
+                $this->cache[CacheHandlerInterface::ENTITY_METADATA][$reflectionProperty->getName()] = [
+                    CacheHandlerInterface::ENTITY_COLUMN   => $this->entityBuilder->getColumn(),
+                    CacheHandlerInterface::ENTITY_TYPE     => $this->entityBuilder->getType(),
+                    CacheHandlerInterface::ENTITY_RELATION => $this->entityBuilder->getRelation()
+                ];
+            }
+        }
+        
+        return $this->cache;
     }
 }

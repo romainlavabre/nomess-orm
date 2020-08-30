@@ -23,12 +23,4 @@ interface QuerySelectInterface
      * @throws ORMException
      */
     public function getQuery( string $classname, $idOrSql, array $parameters ): PDOStatement;
-    
-    
-    /**
-     * Return a metadata of query
-     *
-     * @return array
-     */
-    public function getQueryMetadata(): array;
 }

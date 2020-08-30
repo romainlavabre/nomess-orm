@@ -14,7 +14,4 @@ interface QueryUpdateInterface
      * @return PDOStatement
      */
     public function getQuery( object $object ): PDOStatement;
-    
-    
-    public function getQueryMetadata(): array;
 }

@@ -9,7 +9,6 @@ use PDOStatement;
 
 /**
  * TODO Manage the ManyToMany relation
- * TODO Make the metadata of query
  */
 class CreateQuery extends AbstractAlterData implements QueryCreateInterface
 {
@@ -18,7 +17,6 @@ class CreateQuery extends AbstractAlterData implements QueryCreateInterface
     private const QUERY_VALUES = ' VALUES ';
     private CacheHandlerInterface  $cacheHandler;
     private DriverHandlerInterface $driverHandler;
-    private array                  $query_metadata = array();
     
     
     public function __construct(
@@ -38,19 +36,6 @@ class CreateQuery extends AbstractAlterData implements QueryCreateInterface
     {
         $classname = get_class( $object );
         $cache     = $this->cacheHandler->getCache( $classname );
-        
-        if( $this->cacheHandler->hasCreateQuery( $classname ) ) {
-            $this->query_metadata = $this->cacheHandler->getCreateMetadataQuery( $classname );
-            
-            $statement = $this->driverHandler->getConnection()
-                                             ->prepare(
-                                                 $this->cacheHandler->getCreateQuery( $classname )
-                                             );
-            
-            $this->bindValue( $statement, $object );
-            
-            return $statement;
-        }
         
         $statement = $this->driverHandler->getConnection()
                                          ->prepare(
@@ -114,16 +99,5 @@ class CreateQuery extends AbstractAlterData implements QueryCreateInterface
         }
         
         return rtrim( $line, ', ' ) . ')';
-    }
-    
-    
-    /**
-     * Return a metadata of query
-     *
-     * @return array
-     */
-    public function getQueryMetadata(): array
-    {
-        return $this->query_metadata;
     }
 }

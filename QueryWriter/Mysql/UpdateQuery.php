@@ -18,7 +18,6 @@ class UpdateQuery extends AbstractAlterData implements QueryUpdateInterface
     private const QUERY_WHERE  = ' WHERE ';
     private CacheHandlerInterface    $cacheHandler;
     private DriverHandlerInterface   $driverHandler;
-    private array                    $query_metadata = array();
     
     
     public function __construct(
@@ -39,18 +38,6 @@ class UpdateQuery extends AbstractAlterData implements QueryUpdateInterface
         $classname  = get_class( $object );
         $cache      = $this->cacheHandler->getCache( $classname );
         $connection = $this->driverHandler->getConnection();
-        
-        if( $this->cacheHandler->hasUpdateQuery( $classname ) ) {
-            $statement = $connection->prepare(
-                $this->cacheHandler->getUpdateQuery( $classname ) . $this->queryWhere( $cache, $object )
-            );
-            
-            $this->query_metadata = $this->cacheHandler->getUpdateMetadataQuery( $classname );
-            
-            $this->bindValue( $statement, $object );
-            
-            return $statement;
-        }
         
         $statement = $connection->prepare(
             self::QUERY_UPDATE .
@@ -119,11 +106,5 @@ class UpdateQuery extends AbstractAlterData implements QueryUpdateInterface
         
         return self::QUERY_WHERE . $cache[CacheHandlerInterface::ENTITY_METADATA]['id'][CacheHandlerInterface::ENTITY_COLUMN] . '_id = \'' .
                $reflectionProperty->getValue( $object ) . '\'';
-    }
-    
-    
-    public function getQueryMetadata(): array
-    {
-        return $this->query_metadata;
     }
 }
