@@ -8,4 +8,7 @@ interface DriverHandlerInterface
 {
     
     public function getConnection(): \PDO;
+    
+    
+    public function getDatabase(): string;
 }

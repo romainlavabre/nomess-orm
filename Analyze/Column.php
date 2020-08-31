@@ -42,6 +42,8 @@ class Column extends AbstractAnalyze
                         $cache = $this->cacheHandler->getCache( $reflectionClass->getName() );
                         
                         foreach( $cache[CacheHandlerInterface::ENTITY_METADATA] as $propertyName => $array ) {
+                            $this->columns[] = $array[CacheHandlerInterface::ENTITY_COLUMN];
+                            
                             if( $array[CacheHandlerInterface::ENTITY_RELATION] === NULL ) {
                                 $this->createColumn( $array, $cache[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME] );
                             }
@@ -57,7 +59,6 @@ class Column extends AbstractAnalyze
     
     private function createColumn( array $config, string $tableName ): void
     {
-        $this->columns[] = $config[CacheHandlerInterface::ENTITY_COLUMN];
         
         $query = '
         ALTER TABLE `' . $tableName . '`
@@ -65,6 +66,7 @@ class Column extends AbstractAnalyze
                  $config[CacheHandlerInterface::ENTITY_COLUMN] . '` ' .
                  $this->type[$config[CacheHandlerInterface::ENTITY_TYPE]] . ' ' .
                  $this->partNullable( $config[CacheHandlerInterface::ENTITY_IS_NULLABLE], $config[CacheHandlerInterface::ENTITY_TYPE] ) . '
+        ;
         ';
         
         try {
