@@ -38,11 +38,14 @@ class CacheBuilder
                 $this->cache[CacheHandlerInterface::ENTITY_METADATA][$reflectionProperty->getName()] = [
                     CacheHandlerInterface::ENTITY_COLUMN   => $this->entityBuilder->getColumn(),
                     CacheHandlerInterface::ENTITY_TYPE     => $this->entityBuilder->getType(),
-                    CacheHandlerInterface::ENTITY_RELATION => $this->entityBuilder->getRelation()
+                    CacheHandlerInterface::ENTITY_RELATION => $this->entityBuilder->getRelation(),
+                    CacheHandlerInterface::ENTITY_IS_NULLABLE => $this->entityBuilder->isNullable()
                 ];
             }
         }
         
-        return $this->cache;
+        $cache = $this->cache;
+        $this->cache = array();
+        return $cache;
     }
 }

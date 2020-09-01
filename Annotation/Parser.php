@@ -32,7 +32,7 @@ class Parser implements AnnotationParserInterface
     {
         $comments = $this->getDocComment( $reflection );
         
-        if( !$this->has( "@$annotation", $reflection ) ) {
+        if( !$this->has( "$annotation", $reflection ) ) {
             return NULL;
         }
         

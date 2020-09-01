@@ -33,24 +33,23 @@ class Column extends AbstractAnalyze
     public function revalideColumns(): void
     {
         foreach( $this->directories() as $directory ) {
-            foreach( scandir( $directory ) as $files ) {
-                foreach( $files as $file ) {
-                    if( $file !== '.' && $file !== '..' && $file !== '.gitkeep'
-                        && ( $reflectionClass = $this->getReflectionClass( $directory . $file ) ) !== NULL ) {
-                        $this->columns = array();
+            foreach( scandir( $directory ) as $file ) {
+                if( $file !== '.' && $file !== '..' && $file !== '.gitkeep'
+                    && ( $reflectionClass = $this->getReflectionClass( $directory . $file, $file ) ) !== NULL
+                    && $reflectionClass->isInstantiable()) {
+                    $this->columns = array();
+                    
+                    $cache = $this->cacheHandler->getCache( $reflectionClass->getName() );
+
+                    foreach( $cache[CacheHandlerInterface::ENTITY_METADATA] as $propertyName => $array ) {
+                        $this->columns[] = $array[CacheHandlerInterface::ENTITY_COLUMN];
                         
-                        $cache = $this->cacheHandler->getCache( $reflectionClass->getName() );
-                        
-                        foreach( $cache[CacheHandlerInterface::ENTITY_METADATA] as $propertyName => $array ) {
-                            $this->columns[] = $array[CacheHandlerInterface::ENTITY_COLUMN];
-                            
-                            if( $array[CacheHandlerInterface::ENTITY_RELATION] === NULL ) {
-                                $this->createColumn( $array, $cache[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME] );
-                            }
+                        if( $array[CacheHandlerInterface::ENTITY_RELATION] === NULL ) {
+                            $this->createColumn( $array, $cache[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME] );
                         }
-                        
-                        $this->purgeColumns( $cache[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME] );
                     }
+                    
+                    $this->purgeColumns( $cache[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME] );
                 }
             }
         }
@@ -59,7 +58,6 @@ class Column extends AbstractAnalyze
     
     private function createColumn( array $config, string $tableName ): void
     {
-        
         $query = '
         ALTER TABLE `' . $tableName . '`
         ADD `' .
@@ -78,7 +76,7 @@ class Column extends AbstractAnalyze
     
     private function purgeColumns( string $tableName ): void
     {
-        $statement = $this->driverHandler->getConnection()->query( 'DESCRIBE ' . $tableName . ';' );
+        $statement = $this->driverHandler->getConnection()->query( 'DESCRIBE `' . $tableName . '`;' );
         $statement->execute();
         
         foreach( $statement->fetchAll() as $data ) {

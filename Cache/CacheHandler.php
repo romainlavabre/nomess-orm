@@ -10,7 +10,7 @@ use Newwebsouth\Orm\Cache\Builder\CacheBuilder;
 class CacheHandler implements CacheHandlerInterface
 {
     
-    private const PATH_CACHE = ROOT . 'var/cache/orm/table';
+    private const PATH_CACHE = ROOT . 'var/cache/orm/table/';
     private CacheBuilder $cacheBuilder;
     
     
@@ -47,6 +47,6 @@ class CacheHandler implements CacheHandlerInterface
     
     private function write( string $classname, array $cache ): void
     {
-        file_put_contents( $this->getFilename( $classname ) . '.php', "<?php return '" . serialize( $cache ) . "';" );
+        file_put_contents( $this->getFilename( $classname ), "<?php return '" . serialize( $cache ) . "';" );
     }
 }

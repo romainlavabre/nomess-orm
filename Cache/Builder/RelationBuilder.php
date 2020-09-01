@@ -101,6 +101,14 @@ class RelationBuilder
         $classname = $this->reflectionProperty->getType()->getName();
         
         if( $classname === 'array' ) {
+            
+            $shortClassName = $this->annotationParser->grossValue( 'var', $this->reflectionProperty );
+            
+            if($shortClassName === NULL){
+                throw new ORMException('Impossible to resolving type of ' . $this->reflectionProperty->getName() .
+                ' in ' . $this->reflectionProperty->getDeclaringClass()->getName() . '::class missing @var annotation');
+            }
+            
             $classname = $this->getRelationClassnameByVar(
                 $this->annotationParser->grossValue( 'var', $this->reflectionProperty ),
                 $this->reflectionProperty->getDeclaringClass() );

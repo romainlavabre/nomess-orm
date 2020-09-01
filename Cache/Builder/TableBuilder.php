@@ -12,7 +12,7 @@ class TableBuilder
     
     public function getTable(): string
     {
-        return mb_strtolower( str_replace( '_', '', $this->reflectionClass->getName() ) );
+        return mb_strtolower( str_replace( '_', '', $this->reflectionClass->getShortName() ) );
     }
     
     

@@ -67,6 +67,19 @@ class EntityBuilder
         return TRUE;
     }
     
+    public function isNullable(): bool
+    {
+        $instance = $this->reflectionProperty->getDeclaringClass()->newInstanceWithoutConstructor();
+        
+        try {
+            $this->reflectionProperty->setValue($instance, NULL);
+        }catch(\Throwable $th){
+            return FALSE;
+        }
+        
+        return TRUE;
+    }
+    
     
     public function setReflectionProperty( ReflectionProperty $reflectionProperty ): void
     {

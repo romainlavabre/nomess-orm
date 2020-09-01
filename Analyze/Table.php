@@ -9,13 +9,13 @@ class Table extends AbstractAnalyze
     public function revalideTables(): void
     {
         foreach( $this->directories() as $directory ) {
-            foreach( scandir( $directory ) as $files ) {
-                foreach( $files as $file ) {
-                    if( $file !== '.' && $file !== '..' && $file !== '.gitkeep'
-                        && ( $reflectionClass = $this->getReflectionClass( $directory . $file ) ) !== NULL ) {
-                        
-                        $this->createTable( $reflectionClass );
-                    }
+            foreach( scandir( $directory ) as $file ) {
+               
+                if( $file !== '.' && $file !== '..' && $file !== '.gitkeep'
+                    && ( $reflectionClass = $this->getReflectionClass( $directory . $file, $file ) ) !== NULL
+                    && $reflectionClass->isInstantiable()) {
+                    
+                    $this->createTable( $reflectionClass );
                 }
             }
         }

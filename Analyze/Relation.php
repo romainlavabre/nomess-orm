@@ -30,27 +30,26 @@ class Relation extends AbstractAnalyze
     public function revalideRelation(): void
     {
         foreach( $this->directories() as $directory ) {
-            foreach( scandir( $directory ) as $files ) {
-                foreach( $files as $file ) {
-                    if( $file !== '.' && $file !== '..' && $file !== '.gitkeep'
-                        && ( $reflectionClass = $this->getReflectionClass( $directory . $file ) ) !== NULL ) {
-                        
-                        $cache              = $this->cacheHandler->getCache( $reflectionClass->getName() );
-                        $this->joinTables[] = $cache[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME];
-                        
-                        foreach( $cache[CacheHandlerInterface::ENTITY_METADATA] as $propertyName => $array ) {
-                            if( $array[CacheHandlerInterface::ENTITY_RELATION] !== NULL ) {
-                                if( $array[CacheHandlerInterface::ENTITY_RELATION_JOIN_TABLE] !== NULL ) {
-                                    $this->joinTables[] = $array[CacheHandlerInterface::ENTITY_RELATION_JOIN_TABLE];
-                                    $this->createRelation( $array, $cache[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME] );
-                                }
+            foreach( scandir( $directory ) as $file ) {
+                if( $file !== '.' && $file !== '..' && $file !== '.gitkeep'
+                    && ( $reflectionClass = $this->getReflectionClass( $directory . $file, $file ) ) !== NULL
+                    && $reflectionClass->isInstantiable()) {
+                    
+                    $cache              = $this->cacheHandler->getCache( $reflectionClass->getName() );
+                    $this->joinTables[] = $cache[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME];
+                    
+                    foreach( $cache[CacheHandlerInterface::ENTITY_METADATA] as $propertyName => $array ) {
+                        if( $array[CacheHandlerInterface::ENTITY_RELATION] !== NULL ) {
+                            if( $array[CacheHandlerInterface::ENTITY_RELATION_JOIN_TABLE] !== NULL ) {
+                                $this->joinTables[] = $array[CacheHandlerInterface::ENTITY_RELATION_JOIN_TABLE];
+                                $this->createRelation( $array, $cache[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME] );
                             }
-                            
-                            $this->joinColumn[] = $array[CacheHandlerInterface::ENTITY_COLUMN];
                         }
                         
-                        $this->purgeForeignKey( $cache[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME], $cache );
+                        $this->joinColumn[] = $array[CacheHandlerInterface::ENTITY_COLUMN];
                     }
+                    
+                    $this->purgeForeignKey( $cache[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME], $cache );
                 }
             }
         }
