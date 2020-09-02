@@ -58,6 +58,8 @@ class Column extends AbstractAnalyze
     
     private function createColumn( array $config, string $tableName ): void
     {
+        echo "Create column " . $config[CacheHandlerInterface::ENTITY_COLUMN] . "\n";
+        
         $query = '
         ALTER TABLE `' . $tableName . '`
         ADD `' .
@@ -80,7 +82,10 @@ class Column extends AbstractAnalyze
         $statement->execute();
         
         foreach( $statement->fetchAll() as $data ) {
-            if( !in_array( $data[0], $this->columns ) ) {
+            if( !in_array( $data[0], $this->columns ) && !preg_match('/.+_id/', $data[0])) {
+                
+                echo "Remove Column " . $data[0];
+                
                 $query = '
                 ALTER TABLE `' . $tableName . '`
                 DROP `' . $data[0] . '`;';

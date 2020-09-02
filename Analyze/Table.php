@@ -24,6 +24,8 @@ class Table extends AbstractAnalyze
     
     private function createTable( \ReflectionClass $reflectionClass ): void
     {
+        echo "Create table " . mb_strtolower( str_replace( [ '_', '-' ], '', $reflectionClass->getShortName() )) . " if not exists\n";
+        
         $this->driverHandler->getConnection()
                             ->query( 'CREATE TABLE IF NOT EXISTS `' .
                                      mb_strtolower( str_replace( [ '_', '-' ], '', $reflectionClass->getShortName() ) ) .

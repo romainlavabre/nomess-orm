@@ -31,15 +31,12 @@ class LauncherAnalyze
             )
         );
         
-        echo "Launch the analyze of tables...\r";
+        echo "Launch the analyze of tables...\n";
         ( new Newwebsouth\Orm\Analyze\Table( $driverHandler ) )->revalideTables();
-        echo "OK\r";
-        echo "Launch the analyze of columns...\r";
+        echo "Launch the analyze of columns...\n";
         ( new Newwebsouth\Orm\Analyze\Column( $driverHandler, $cacheHandler ) )->revalideColumns();
-        echo "OK\r";
-        echo "Launch the analyze of relations...\r";
+        echo "Launch the analyze of relations...\n";
         ( new Newwebsouth\Orm\Analyze\Relation( $driverHandler, $cacheHandler ) )->revalideRelation();
-        echo "OK\r";
         
         echo "Your database is updated";
     }

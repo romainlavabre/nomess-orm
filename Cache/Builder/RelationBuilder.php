@@ -110,7 +110,7 @@ class RelationBuilder
             }
             
             $classname = $this->getRelationClassnameByVar(
-                $this->annotationParser->grossValue( 'var', $this->reflectionProperty ),
+                str_replace(['|', '[', ']', 'null', 'NULL'], '', $this->annotationParser->grossValue( 'var', $this->reflectionProperty )),
                 $this->reflectionProperty->getDeclaringClass() );
         }
         

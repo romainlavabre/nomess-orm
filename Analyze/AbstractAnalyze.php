@@ -40,6 +40,11 @@ class AbstractAnalyze
         return NULL;
     }
     
+    protected function getTimestamp(): string
+    {
+        return md5(time());
+    }
+    
     private function scanRecursive(string $dir) : array
     {
         $pathDirSrc = $dir;
