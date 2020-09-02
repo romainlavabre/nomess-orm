@@ -5,6 +5,7 @@ namespace Newwebsouth\Orm\Handler;
 
 
 use Newwebsouth\Orm\Driver\DriverHandlerInterface;
+use Newwebsouth\Orm\Exception\ORMException;
 use Newwebsouth\Orm\Handler\Dispatcher\DispatcherHandler;
 use Newwebsouth\Orm\QueryWriter\QueryCreateInterface;
 use Newwebsouth\Orm\QueryWriter\QueryDeleteInterface;
@@ -57,19 +58,17 @@ class SaveHandler implements SaveHandlerInterface
                 }
             }
             
-            
             foreach( Store::getToCreate() as $classname => &$array ) {
                 foreach( $array as &$object ) {
                     $this->queryCreate->getQuery( $object )->execute();
                     
-                    Store::getReflection( get_class( $object ), 'id' )->setValue( $connection->lastInsertId() );
+                    Store::getReflection( get_class( $object ), 'id' )->setValue( $object, $connection->lastInsertId() );
                 }
             }
             
-            
             foreach( Store::getToUpdate() as $classname => &$array ) {
                 foreach( $array as &$object ) {
-                    $this->queryCreate->getQuery( $object )->execute();
+                    $this->queryUpdate->getQuery( $object )->execute();
                 }
             }
             
@@ -86,6 +85,10 @@ class SaveHandler implements SaveHandlerInterface
             $this->toJoin = array();
         } catch( \Throwable $th ) {
             $connection->rollBack();
+            
+            if(NOMESS_CONTEXT === 'DEV'){
+                throw new ORMException($th->getMessage() . ' in ' . $th->getFile() . ' line ' . $th->getLine());
+            }
             
             return FALSE;
         }

@@ -37,7 +37,13 @@ abstract class AbstractAlterData
                         $statement->bindValue( ':' . $columnName, NULL );
                     }
                 } else {
-                    $statement->bindValue( ':' . $columnName, $reflectionProperty->getValue( $object ) );
+                    if(is_bool($value)){
+                        $value = (int)$value;
+                    }elseif(is_array($value)){
+                        $value = serialize($value);
+                    }
+                    
+                    $statement->bindValue( ':' . $columnName, $value );
                 }
             }
         }

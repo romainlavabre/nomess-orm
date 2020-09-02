@@ -59,7 +59,7 @@ class SelectQuery implements QuerySelectInterface
     private function queryPartTableTarget( array $cache ): string
     {
         return self::QUERY_FROM .
-               $cache[self::CACHE_TARGET][CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME];
+               $cache[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME];
     }
     
     
@@ -77,7 +77,7 @@ class SelectQuery implements QuerySelectInterface
         if( is_int( $idOrSql ) ) {
             $this->toBind['id'] = $idOrSql;
             
-            return self::QUERY_WHERE . $cache[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME] . '_id = :id';
+            return self::QUERY_WHERE . 'id = :id';
         } elseif( !empty( $idOrSql ) ) {
             $this->toBind = $parameters;
             

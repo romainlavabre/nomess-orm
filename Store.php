@@ -140,8 +140,8 @@ class Store
     
     public static function repositoryHas( string $classname, int $id ): bool
     {
-        return !array_key_exists( $classname, self::$repository )
-               || !array_key_exists( $id, self::$repository[$classname] );
+        return array_key_exists( $classname, self::$repository )
+               && array_key_exists( $id, self::$repository[$classname] );
     }
     
     

@@ -35,19 +35,23 @@ class FindHandler implements FindHandlerInterface
     public function handle( string $classname, $idOrSql, array $parameters = NULL )
     {
         if( preg_match( '/[0-9]+/', $idOrSql ) ) {
-            if( Store::repositoryHas( $classname, $idOrSql ) ) {
+            if( Store::repositoryHas( $classname, (int)$idOrSql ) ) {
                 return Store::getOfRepository( $classname, $idOrSql );
             }
         }
         
-        $statement = $this->querySelect->getQuery( $classname, $idOrSql, $parameters );
+        $statement = $this->querySelect->getQuery( $classname, $idOrSql, is_array($parameters) ? $parameters : []  );
         $statement->execute();
         
-        foreach( $data = $statement->fetchAll( \PDO::FETCH_CLASS, $classname ) as $object ) {
+        $result = array();
+        
+        foreach( $statement->fetchAll( \PDO::FETCH_ASSOC ) as $data ) {
+            $this->setObject($object = new $classname(), $data);
             $this->execute( $classname, $object );
+            $result[] = $object;
         }
         
-        return $this->returnData( $idOrSql, $data );
+        return $this->returnData( $idOrSql, $result );
     }
     
     
@@ -65,7 +69,7 @@ class FindHandler implements FindHandlerInterface
                     Store::getReflection( get_class( $target ), 'id' )->getValue( $target )
                 ) );
                 
-                $this->fill( $array[CacheHandlerInterface::ENTITY_RELATION_CLASSNAME], $statement, $target, $propertyName );
+                $this->fill( $array[CacheHandlerInterface::ENTITY_RELATION][CacheHandlerInterface::ENTITY_RELATION_CLASSNAME], $statement, $target, $propertyName );
             }
         }
     }
@@ -74,26 +78,33 @@ class FindHandler implements FindHandlerInterface
     private function fill( string $classname, PDOStatement $statement, object $object, string $propertyName ): void
     {
         $statement->execute();
-        $result             = $statement->fetchAll( \PDO::FETCH_CLASS, $classname );
+        $result             = $statement->fetchAll( \PDO::FETCH_ASSOC );
+        $resultValue = array();
+        
+        foreach($result as $data){
+            $this->setObject($class = new $classname(), $data);
+            
+            $resultValue[] = $class;
+        }
         $reflectionProperty = Store::getReflection( get_class( $object ), $propertyName );
         
         if( $reflectionProperty->getType()->getName() === 'array' ) {
-            $reflectionProperty->setValue( $object, $result );
+            $reflectionProperty->setValue( $object, $resultValue );
         } else {
             if( !empty( $result ) ) {
-                $reflectionProperty->setValue( $object, $result[0] );
+                $reflectionProperty->setValue( $object, $resultValue[0] );
             } else {
                 $reflectionProperty->setValue( $object, NULL );
             }
         }
         
-        foreach( $result as $object ) {
+        foreach( $resultValue as $object ) {
             $this->execute( $classname, $object );
         }
     }
     
     
-    private function getJoinCondition( string $classnameTarget, string $relationType, string $relationTable, string $classnameHolder, int $holderId ): string
+    private function getJoinCondition( string $classnameTarget, string $relationType, ?string $relationTable, string $classnameHolder, int $holderId ): string
     {
         // SELECT * FROM $classname WHERE
         $targetCache = $this->cacheHandler->getCache( $classnameTarget );
@@ -139,5 +150,23 @@ class FindHandler implements FindHandlerInterface
         }
         
         return $data;
+    }
+    
+    private function setObject(object $object, array $data): void
+    {
+        foreach($data as $index => $value){
+            try {
+                $reflectionProperty = Store::getReflection( get_class( $object ), $index );
+    
+                if( $reflectionProperty->getType() === 'bool' ) {
+                    $value = (bool)$value;
+                } elseif( $reflectionProperty->getType() === 'array' ) {
+                    if( !is_array( $value ) ) {
+                        $value = array();
+                    }
+                }
+                $reflectionProperty->setValue( $object, $value );
+            }catch(\Throwable $th){}
+        }
     }
 }

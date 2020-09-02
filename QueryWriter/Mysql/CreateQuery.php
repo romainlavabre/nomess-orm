@@ -68,7 +68,10 @@ class CreateQuery extends AbstractAlterData implements QueryCreateInterface
         $line = ' (';
         
         foreach( $cache[CacheHandlerInterface::ENTITY_METADATA] as $propertyName => $value ) {
-            $line .= $value[CacheHandlerInterface::ENTITY_COLUMN] . ', ';
+            // Exclude relations
+            if($value[CacheHandlerInterface::ENTITY_RELATION] === NULL && $propertyName !== 'id') {
+                $line .= '`' . $value[CacheHandlerInterface::ENTITY_COLUMN] . '`, ';
+            }
         }
         
         return rtrim( $line, ', ' ) . ')';
@@ -87,9 +90,8 @@ class CreateQuery extends AbstractAlterData implements QueryCreateInterface
         
         foreach( $cache[CacheHandlerInterface::ENTITY_METADATA] as $propertyName => $value ) {
             
-            // Relation ManyTo... excluded
-            if( $value[CacheHandlerInterface::ENTITY_RELATION] !== NULL
-                || strpos( $value[CacheHandlerInterface::ENTITY_RELATION][CacheHandlerInterface::ENTITY_RELATION_TYPE], 'OneTo' ) !== FALSE ) {
+            // Exclude relations
+            if( $value[CacheHandlerInterface::ENTITY_RELATION] === NULL && $propertyName !== 'id') {
                 
                 $columnName = $value[CacheHandlerInterface::ENTITY_COLUMN];
                 

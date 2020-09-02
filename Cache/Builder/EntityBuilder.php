@@ -72,6 +72,7 @@ class EntityBuilder
         $instance = $this->reflectionProperty->getDeclaringClass()->newInstanceWithoutConstructor();
         
         try {
+            $this->reflectionProperty->setAccessible(TRUE);
             $this->reflectionProperty->setValue($instance, NULL);
         }catch(\Throwable $th){
             return FALSE;

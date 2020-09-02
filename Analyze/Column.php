@@ -14,8 +14,8 @@ class Column extends AbstractAnalyze
     private array                 $type    = [
         'string' => 'VARCHAR(255)',
         'array'  => 'TEXT',
-        'int'    => 'UNSIGNED INT(11)',
-        'float'  => 'UNSIGNED FLOAT(11,4)',
+        'int'    => 'INT(11) UNSIGNED',
+        'float'  => 'FLOAT(11,4) UNSIGNED',
         'bool'   => 'TINYINT(1)'
     ];
     private array                 $columns = array();
@@ -40,7 +40,8 @@ class Column extends AbstractAnalyze
                     $this->columns = array();
                     
                     $cache = $this->cacheHandler->getCache( $reflectionClass->getName() );
-
+                    echo "Class " . $reflectionClass->getName() . "::class\n";
+                    
                     foreach( $cache[CacheHandlerInterface::ENTITY_METADATA] as $propertyName => $array ) {
                         $this->columns[] = $array[CacheHandlerInterface::ENTITY_COLUMN];
                         
@@ -71,7 +72,8 @@ class Column extends AbstractAnalyze
         
         try {
             $this->driverHandler->getConnection()->query( $query )->execute();
-        } catch( \Throwable $th ) {
+        }catch(\Throwable $th){
+        
         }
     }
     

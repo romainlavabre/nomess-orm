@@ -35,6 +35,7 @@ class UpdateQuery extends AbstractAlterData implements QueryUpdateInterface
      */
     public function getQuery( object $object ): PDOStatement
     {
+        $this->toBind = array();
         $classname  = get_class( $object );
         $cache      = $this->cacheHandler->getCache( $classname );
         $connection = $this->driverHandler->getConnection();
@@ -79,14 +80,26 @@ class UpdateQuery extends AbstractAlterData implements QueryUpdateInterface
         foreach( $cache[CacheHandlerInterface::ENTITY_METADATA] as $propertyName => $array ) {
             
             //Relation ManyTo... excluded
-            if( $array[CacheHandlerInterface::ENTITY_RELATION] === NULL
-                || strpos( $array[CacheHandlerInterface::ENTITY_RELATION_TYPE], 'OneTo' ) !== FALSE ) {
+            if( ( $array[CacheHandlerInterface::ENTITY_RELATION] === NULL
+                  || strpos( $array[CacheHandlerInterface::ENTITY_RELATION][CacheHandlerInterface::ENTITY_RELATION_TYPE], 'OneTo' ) !== FALSE )
+                && $propertyName !== 'id' ) {
                 
-                $columnName = $array[CacheHandlerInterface::ENTITY_COLUMN];
-                $line       .= $columnName . ' = :' . $columnName . ', ';
+                $columnName = NULL;
+                
+                if( $array[CacheHandlerInterface::ENTITY_RELATION] !== NULL ) {
+                    $columnName = $this->cacheHandler->getCache(
+                            $array[CacheHandlerInterface::ENTITY_RELATION]
+                            [CacheHandlerInterface::ENTITY_RELATION_CLASSNAME]
+                        )[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME] . '_id';
+                } else {
+                    $columnName = $array[CacheHandlerInterface::ENTITY_COLUMN];
+                }
+                
+                $line .= '`' . $columnName . '` = :' . $columnName . ', ';
                 
                 $this->toBind[$propertyName] = $columnName;
             }
+            
         }
         
         return rtrim( $line, ', ' );
@@ -104,7 +117,7 @@ class UpdateQuery extends AbstractAlterData implements QueryUpdateInterface
     {
         $reflectionProperty = Store::getReflection( get_class( $object ), 'id' );
         
-        return self::QUERY_WHERE . $cache[CacheHandlerInterface::ENTITY_METADATA]['id'][CacheHandlerInterface::ENTITY_COLUMN] . '_id = \'' .
-               $reflectionProperty->getValue( $object ) . '\'';
+        return self::QUERY_WHERE . 'id = ' .
+               $reflectionProperty->getValue( $object );
     }
 }
