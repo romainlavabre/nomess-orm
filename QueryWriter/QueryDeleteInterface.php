@@ -7,5 +7,5 @@ namespace Newwebsouth\Orm\QueryWriter;
 interface QueryDeleteInterface
 {
     
-    public function getQuery( string $classname, object $object ): \PDOStatement;
+    public function getQuery( object $object ): \PDOStatement;
 }

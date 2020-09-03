@@ -32,7 +32,6 @@ class JoinQuery implements QueryJoinInterface
      */
     public function getQuery( object $object ): PDOStatement
     {
-        
         return $this->driverHandler->getConnection()->prepare( implode( '', $this->travel( $object ) ) );
     }
     
@@ -53,17 +52,17 @@ class JoinQuery implements QueryJoinInterface
                         $cacheTarget = $this->cacheHandler->getCache( get_class( $holded ) );
                     }
                     
-                    $queries[] = 'DELETE FROM ' .
+                    $queries[] = 'DELETE FROM `' .
                                  $array[CacheHandlerInterface::ENTITY_RELATION][CacheHandlerInterface::ENTITY_RELATION_JOIN_TABLE] .
-                                 ' WHERE ' .
+                                 '` WHERE ' .
                                  $cacheHolder[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME] .
                                  '_id = ' . $this->getId( $object ) .
                                  ' AND ' . $cacheTarget[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME] . '_id = ' .
                                  $this->getId( $holded ) . ';';
                     
-                    $queries[] = 'INSERT INTO ' .
+                    $queries[] = 'INSERT INTO `' .
                                  $array[CacheHandlerInterface::ENTITY_RELATION][CacheHandlerInterface::ENTITY_RELATION_JOIN_TABLE] .
-                                 ' (' . $cacheHolder[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME] . '_id, ' .
+                                 '` (' . $cacheHolder[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME] . '_id, ' .
                                  $cacheTarget[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME] . '_id) VALUES (' .
                                  $this->getId( $object ) . ', ' . $this->getId( $holded ) . ');';
                 }

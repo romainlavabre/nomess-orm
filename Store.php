@@ -149,4 +149,18 @@ class Store
     {
         return self::$repository[$classname][$id];
     }
+    
+    public static function addToRepository(object $object): void
+    {
+        $classname = get_class($object);
+        $id = self::getReflection($classname, 'id')->getValue($object);
+        
+        if(!self::repositoryHas($classname, $id)){
+            if(!array_key_exists($classname, self::$repository)){
+                self::$repository[$classname] = array();
+            }
+            
+            self::$repository[$classname][$id] = $object;
+        }
+    }
 }

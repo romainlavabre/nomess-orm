@@ -34,6 +34,7 @@ class CreateQuery extends AbstractAlterData implements QueryCreateInterface
      */
     public function getQuery( object $object ): PDOStatement
     {
+
         $classname = get_class( $object );
         $cache     = $this->cacheHandler->getCache( $classname );
         
@@ -42,9 +43,8 @@ class CreateQuery extends AbstractAlterData implements QueryCreateInterface
                                              self::QUERY_INSERT .
                                              $this->queryTable( $cache ) .
                                              $this->queryColumn( $cache ) .
-                                             $this->queryParameters( $cache )
+                                             $this->queryParameters( $cache ) . ';'
                                          );
-        
         $this->bindValue( $statement, $object );
         
         return $statement;
@@ -53,7 +53,7 @@ class CreateQuery extends AbstractAlterData implements QueryCreateInterface
     
     private function queryTable( array $cache ): string
     {
-        return $cache[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME];
+        return '`' . $cache[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME] . '`';
     }
     
     

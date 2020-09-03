@@ -18,10 +18,20 @@ class DeleteQuery implements QueryDeleteInterface
     private DriverHandlerInterface $driverHandler;
     
     
-    public function getQuery( string $classname, object $object ): \PDOStatement
+    public function __construct(
+        CacheHandlerInterface $cacheHandler,
+        DriverHandlerInterface $driverHandler
+    )
+    {
+        $this->cacheHandler  = $cacheHandler;
+        $this->driverHandler = $driverHandler;
+    }
+    
+    
+    public function getQuery( object $object ): \PDOStatement
     {
         
-        $cache = $this->cacheHandler->getCache( $classname );
+        $cache = $this->cacheHandler->getCache( get_class( $object ) );
         
         $statement = $this->driverHandler->getConnection()->prepare(
             self::QUERY_DELETE . $this->queryTable( $cache ) . self::QUERY_WHERE . $this->queryWhere( $object ) . ';'
@@ -33,7 +43,7 @@ class DeleteQuery implements QueryDeleteInterface
     
     private function queryTable( array $cache ): string
     {
-        return $cache[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME];
+        return '`' . $cache[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME] . '`';
     }
     
     

@@ -12,6 +12,7 @@ class CacheHandler implements CacheHandlerInterface
     
     private const PATH_CACHE = ROOT . 'var/cache/orm/table/';
     private CacheBuilder $cacheBuilder;
+    private array $cache = array();
     
     
     public function __construct( CacheBuilder $cacheBuilder )
@@ -25,7 +26,11 @@ class CacheHandler implements CacheHandlerInterface
      */
     public function getCache( string $classname ): array
     {
-        return $this->getArray( $classname );
+        if(!array_key_exists($classname, $this->cache)) {
+            return $this->cache[$classname] = $this->getArray($classname);
+        }
+        
+        return $this->cache[$classname];
     }
     
     

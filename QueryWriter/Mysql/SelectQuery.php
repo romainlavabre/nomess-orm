@@ -43,7 +43,6 @@ class SelectQuery implements QuerySelectInterface
                  $this->queryWhereClause( $idOrSql, $parameters, $cache ) . ';';
         
         $statement = $this->driverHandler->getConnection()->prepare( $query );
-        
         $this->bindValue( $statement );
         
         return $statement;

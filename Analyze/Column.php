@@ -104,7 +104,7 @@ class Column extends AbstractAnalyze
         }
         
         if( $type === 'string' || $type === 'array' ) {
-            return 'NOT NULL DEFAULT \'\'';
+            return 'NOT NULL';
         }
         
         if( $type === 'int' || $type === 'bool' ) {

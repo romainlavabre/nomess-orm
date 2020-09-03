@@ -108,14 +108,16 @@ class DispatcherHandler
     private function orientDispatcher( object $object ): void
     {
         if( !Store::toDeleteHas( $object ) ) {
+            $cache = $this->cacheHandler->getCache( get_class( $object ) );
+            
             if( $this->isNewInstance( $object ) ) {
                 if( !Store::toCreateHas( $object ) ) {
-                    $this->dispatchCreate( $this->cacheHandler->getCache( get_class( $object ) ), $object );
+                    $this->dispatchCreate( $cache, $object );
                 }
-            } else {
-                if( !Store::toUpdateHas( $object ) ) {
-                    $this->dispatchUpdate( $this->cacheHandler->getCache( get_class( $object ) ), $object );
-                }
+            }
+    
+            if( !Store::toUpdateHas( $object ) ) {
+                $this->dispatchUpdate( $cache, $object );
             }
         }
     }
@@ -130,7 +132,7 @@ class DispatcherHandler
     private function isNewInstance( object $object ): bool
     {
         $value              = 0;
-        $reflectionProperty = new \ReflectionProperty( get_class( $object ), 'id' );
+        $reflectionProperty = Store::getReflection(get_class($object), 'id');
         
         if( !$reflectionProperty->isPublic() ) {
             $reflectionProperty->setAccessible( TRUE );

@@ -54,7 +54,7 @@ class SaveHandler implements SaveHandlerInterface
             
             foreach( Store::getToDelete() as $classname => &$array ) {
                 foreach( $array as &$object ) {
-                    $this->queryCreate->getQuery( $object )->execute();
+                    $this->queryDelete->getQuery( $object )->execute();
                 }
             }
             

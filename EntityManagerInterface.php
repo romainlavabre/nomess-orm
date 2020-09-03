@@ -18,7 +18,7 @@ interface EntityManagerInterface
      *                                  </code>
      * @return mixed
      */
-    public function find( string $classname, $idOrSql, array $parameter = NULL );
+    public function find( string $classname, $idOrSql = NULL, array $parameter = NULL );
     
     
     /**

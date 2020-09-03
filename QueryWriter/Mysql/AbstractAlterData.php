@@ -28,9 +28,9 @@ abstract class AbstractAlterData
                 $value = $reflectionProperty->getValue( $object );
                 
                 if( is_object( $value ) ) {
-                    $reflectionPropertyOfValue = Store::getReflection( get_class( $object ), 'id' );
+                    $reflectionPropertyOfValue = Store::getReflection( get_class( $value ), 'id' );
                     
-                    if( $reflectionPropertyOfValue->isInitialized( $value ) && !empty( $id = $reflectionPropertyOfValue->getValue( $object ) ) ) {
+                    if( $reflectionPropertyOfValue->isInitialized( $value ) && !empty( $id = $reflectionPropertyOfValue->getValue( $value ) ) ) {
                         
                         $statement->bindValue( ':' . $columnName, $id );
                     } else {
@@ -45,7 +45,16 @@ abstract class AbstractAlterData
                     
                     $statement->bindValue( ':' . $columnName, $value );
                 }
+            }else{
+                if($reflectionProperty->getType()->getName() === 'array') {
+                    $statement->bindValue( ':' . $columnName, serialize(array()) );
+                }else {
+                    $statement->bindValue( ':' . $columnName, NULL );
+                }
+                
             }
         }
+        
+        $this->toBind = array();
     }
 }

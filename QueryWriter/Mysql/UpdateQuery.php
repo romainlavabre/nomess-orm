@@ -63,7 +63,7 @@ class UpdateQuery extends AbstractAlterData implements QueryUpdateInterface
      */
     private function queryTable( array $cache ): string
     {
-        return $cache[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME];
+        return '`' . $cache[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME] . '`';
     }
     
     
@@ -88,8 +88,7 @@ class UpdateQuery extends AbstractAlterData implements QueryUpdateInterface
                 
                 if( $array[CacheHandlerInterface::ENTITY_RELATION] !== NULL ) {
                     $columnName = $this->cacheHandler->getCache(
-                            $array[CacheHandlerInterface::ENTITY_RELATION]
-                            [CacheHandlerInterface::ENTITY_RELATION_CLASSNAME]
+                            $array[CacheHandlerInterface::ENTITY_RELATION][CacheHandlerInterface::ENTITY_RELATION_CLASSNAME]
                         )[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME] . '_id';
                 } else {
                     $columnName = $array[CacheHandlerInterface::ENTITY_COLUMN];
