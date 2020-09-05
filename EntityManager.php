@@ -31,9 +31,9 @@ class EntityManager implements EntityManagerInterface
     }
     
     
-    public function find( string $classname, $idOrSql = NULL, array $parameter = NULL )
+    public function find( string $classname, $idOrSql = NULL, array $parameter = [], string $lock_type = NULL)
     {
-        return $this->findHandler->handle( $classname, $idOrSql, $parameter );
+        return $this->findHandler->handle( $classname, $idOrSql, $parameter, $lock_type );
     }
     
     

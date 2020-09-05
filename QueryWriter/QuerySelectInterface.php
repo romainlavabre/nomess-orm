@@ -22,5 +22,5 @@ interface QuerySelectInterface
      * @return PDOStatement
      * @throws ORMException
      */
-    public function getQuery( string $classname, $idOrSql, array $parameters ): PDOStatement;
+    public function getQuery( string $classname, $idOrSql, array $parameters, ?string $lock_type): PDOStatement;
 }

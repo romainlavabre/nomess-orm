@@ -31,13 +31,13 @@ class FindHandler implements FindHandlerInterface
     /**
      * @inheritDoc
      */
-    public function handle( string $classname, $idOrSql, array $parameters = NULL )
+    public function handle( string $classname, $idOrSql, array $parameters, ?string $lock_type)
     {
         if( preg_match( '/^[0-9]+$/', $idOrSql ) && Store::repositoryHas( $classname, (int)$idOrSql ) ) {
             return Store::getOfRepository( $classname, $idOrSql );
         }
         
-        $statement = $this->querySelect->getQuery( $classname, $idOrSql, is_array( $parameters ) ? $parameters : [] );
+        $statement = $this->querySelect->getQuery( $classname, $idOrSql, $parameters, $lock_type);
         $statement->execute();
         
         $result = array();

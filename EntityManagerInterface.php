@@ -7,6 +7,10 @@ namespace Newwebsouth\Orm;
 interface EntityManagerInterface
 {
     
+    public const LOCK_SHARE     = 'LOCK IN SHARE MODE';
+    public const LOCK_EXCLISIVE = 'FOR UPDATE';
+    
+    
     /**
      * @param string $classname         The class name of target
      * @param $idOrSql                  Identifiant or where clause in sql
@@ -18,7 +22,7 @@ interface EntityManagerInterface
      *                                  </code>
      * @return mixed
      */
-    public function find( string $classname, $idOrSql = NULL, array $parameter = NULL );
+    public function find( string $classname, $idOrSql = NULL, array $parameter = [], string $lock_type = NULL );
     
     
     /**

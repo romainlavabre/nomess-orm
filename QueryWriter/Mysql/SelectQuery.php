@@ -34,13 +34,13 @@ class SelectQuery implements QuerySelectInterface
      * @param array $parameters
      * @return PDOStatement
      */
-    public function getQuery( string $classname, $idOrSql, array $parameters ): PDOStatement
+    public function getQuery( string $classname, $idOrSql, array $parameters, ?string $lock_type): PDOStatement
     {
         $cache = $this->cacheHandler->getCache( $classname );
         
         $query = self::QUERY_SELECT . '*' .
                  $this->queryPartTableTarget( $cache ) .
-                 $this->queryWhereClause( $idOrSql, $parameters, $cache ) . ';';
+                 $this->queryWhereClause( $idOrSql, $parameters, $cache ) . ' ' . $lock_type . ';';
         
         $statement = $this->driverHandler->getConnection()->prepare( $query );
         $this->bindValue( $statement );

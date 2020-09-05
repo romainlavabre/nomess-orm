@@ -68,19 +68,19 @@ class Relation extends AbstractAnalyze
         
         if( $relationType === 'ManyToMany' ) {
             try {
+                $tableJoin = $config[CacheHandlerInterface::ENTITY_RELATION][CacheHandlerInterface::ENTITY_RELATION_JOIN_TABLE];
+                
                 echo "Try to create table " . $config[CacheHandlerInterface::ENTITY_RELATION][CacheHandlerInterface::ENTITY_RELATION_JOIN_TABLE] . " if not exists";
                 $this->driverHandler->getConnection()
-                                    ->query( 'CREATE TABLE IF NOT EXISTS `' .
-                                             $config[CacheHandlerInterface::ENTITY_RELATION][CacheHandlerInterface::ENTITY_RELATION_JOIN_TABLE] .
-                                             '`
+                                    ->query( 'CREATE TABLE IF NOT EXISTS `' . $tableJoin . '`
                                      (
                                         `' . $tableName . '_id` INT UNSIGNED NOT NULL,
                                         `' . $tableRelation . '_id` INT UNSIGNED NOT NULL,
-                                        UNIQUE KEY `UQ_' . $tableName . '_' . $tableRelation . '` (`' . $tableName . '_id`,`' . $tableRelation . '_id`),
-                                        KEY `fk_' . $tableName . '_' . $tableName . '` (`' . $tableName . '_id`),
-                                        KEY `fk_' . $tableRelation . '_' . $tableName . '` (`' . $tableRelation . '_id`),
-                                        CONSTRAINT `c_' . $tableName . '_' . $tableName . '` FOREIGN KEY (`' . $tableName . '_id`) REFERENCES `' . $tableName . '` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-                                        CONSTRAINT `c_' . $tableRelation . '_' . $tableName . '` FOREIGN KEY (`' . $tableRelation . '_id`) REFERENCES `' . $tableRelation . '` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+                                        UNIQUE KEY `UQ_' . $tableName . '_' . $tableJoin . '` (`' . $tableName . '_id`,`' . $tableRelation . '_id`),
+                                        KEY `fk_' . $tableName . '_' . $tableJoin . '` (`' . $tableName . '_id`),
+                                        KEY `fk_' . $tableRelation . '_' . $tableJoin . '` (`' . $tableRelation . '_id`),
+                                        CONSTRAINT `c_' . $tableName . '_' . $tableJoin . '` FOREIGN KEY (`' . $tableName . '_id`) REFERENCES `' . $tableName . '` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+                                        CONSTRAINT `c_' . $tableRelation . '_' . $tableJoin . '` FOREIGN KEY (`' . $tableRelation . '_id`) REFERENCES `' . $tableRelation . '` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
                                      )ENGINE=InnoDB DEFAULT CHARSET=utf8;' )->execute();
             } catch( \Throwable $th ) {
             }

@@ -16,5 +16,5 @@ interface FindHandlerInterface
      * @return mixed
      * @throws ORMException
      */
-    public function handle( string $classname, $idOrSql, array $parameter = NULL );
+    public function handle( string $classname, $idOrSql, array $parameter = [], ?string $lock_type);
 }
