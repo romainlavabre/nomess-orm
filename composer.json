@@ -8,7 +8,10 @@
             "email": "webmaster@newwebsouth.fr"
         }
     ],
-    "require": {},
+    "require": {
+        "nomess/config": "*",
+        "nomess/cache": "*"
+    },
     "autoload": {
         "psr-4": {
             "Nomess\\Component\\Orm\\": "/"

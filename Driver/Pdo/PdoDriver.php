@@ -5,27 +5,28 @@
 namespace Nomess\Component\Orm\Driver\Pdo;
 
 
+use Nomess\Component\Config\ConfigStoreInterface;
 use Nomess\Component\Orm\Driver\DriverHandlerInterface;
 use Nomess\Component\Orm\Driver\Instance;
 
 class PdoDriver implements DriverHandlerInterface
 {
     
-    private const CACHE_PATH = ROOT . 'config/database.php';
-    private const SERVER     = 'server';
-    private const HOST       = 'host';
-    private const PORT       = 'port';
-    private const DB_NAME    = 'dbname';
-    private const ENCODING   = 'encode';
-    private const USERNAME   = 'user';
-    private const PASSWORD   = 'password';
+    private const CONFIG_NAME = 'orm';
+    private const SERVER      = 'server';
+    private const HOST        = 'host';
+    private const PORT        = 'port';
+    private const DB_NAME     = 'dbname';
+    private const ENCODING    = 'encode';
+    private const USERNAME    = 'user';
+    private const PASSWORD    = 'password';
     private \PDO  $connection;
     private array $config;
     
     
-    public function __construct()
+    public function __construct( ConfigStoreInterface $configStore )
     {
-        $this->config = require self::CACHE_PATH;
+        $this->config = $configStore->get( self::CONFIG_NAME );
     }
     
     
