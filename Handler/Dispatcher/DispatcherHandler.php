@@ -1,11 +1,11 @@
 <?php
 
 
-namespace Newwebsouth\Orm\Handler\Dispatcher;
+namespace Nomess\Component\Orm\Handler\Dispatcher;
 
 
-use Newwebsouth\Orm\Cache\CacheHandlerInterface;
-use Newwebsouth\Orm\Store;
+use Nomess\Component\Orm\Cache\CacheHandlerInterface;
+use Nomess\Component\Orm\Store;
 
 /**
  * This class reorganize the object that must be created and updated:

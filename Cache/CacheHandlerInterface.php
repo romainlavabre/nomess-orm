@@ -1,6 +1,6 @@
 <?php
 
-namespace Newwebsouth\Orm\Cache;
+namespace Nomess\Component\Orm\Cache;
 
 interface CacheHandlerInterface
 {

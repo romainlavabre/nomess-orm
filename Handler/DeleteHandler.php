@@ -1,10 +1,10 @@
 <?php
 
 
-namespace Newwebsouth\Orm\Handler;
+namespace Nomess\Component\Orm\Handler;
 
 
-use Newwebsouth\Orm\Store;
+use Nomess\Component\Orm\Store;
 
 class DeleteHandler implements DeleteHandlerInterface
 {

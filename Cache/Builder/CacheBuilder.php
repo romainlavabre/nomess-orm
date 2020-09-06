@@ -2,10 +2,10 @@
 /** @noinspection PhpUndefinedConstantInspection */
 
 
-namespace Newwebsouth\Orm\Cache\Builder;
+namespace Nomess\Component\Orm\Cache\Builder;
 
 
-use Newwebsouth\Orm\Cache\CacheHandlerInterface;
+use Nomess\Component\Orm\Cache\CacheHandlerInterface;
 
 class CacheBuilder
 {

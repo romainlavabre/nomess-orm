@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Newwebsouth\Orm\Handler;
+namespace Nomess\Component\Orm\Handler;
 
 
 interface DeleteHandlerInterface

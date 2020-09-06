@@ -1,9 +1,9 @@
 <?php
 
 
-namespace Newwebsouth\Orm\Analyze;
+namespace Nomess\Component\Orm\Analyze;
 
-use Newwebsouth\Orm\Driver\DriverHandlerInterface;
+use Nomess\Component\Orm\Driver\DriverHandlerInterface;
 
 class AbstractAnalyze
 {

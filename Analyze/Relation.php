@@ -1,11 +1,11 @@
 <?php
 
 
-namespace Newwebsouth\Orm\Analyze;
+namespace Nomess\Component\Orm\Analyze;
 
 
-use Newwebsouth\Orm\Cache\CacheHandlerInterface;
-use Newwebsouth\Orm\Driver\DriverHandlerInterface;
+use Nomess\Component\Orm\Cache\CacheHandlerInterface;
+use Nomess\Component\Orm\Driver\DriverHandlerInterface;
 
 /**
  * TODO Delete foreign key and constraint

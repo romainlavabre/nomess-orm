@@ -1,10 +1,10 @@
 <?php
 
 
-namespace Newwebsouth\Orm\QueryWriter\Mysql;
+namespace Nomess\Component\Orm\QueryWriter\Mysql;
 
 
-use Newwebsouth\Orm\Store;
+use Nomess\Component\Orm\Store;
 
 abstract class AbstractAlterData
 {

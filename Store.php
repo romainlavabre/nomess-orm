@@ -1,6 +1,6 @@
 <?php
 
-namespace Newwebsouth\Orm;
+namespace Nomess\Component\Orm;
 
 use ReflectionClass;
 use ReflectionProperty;

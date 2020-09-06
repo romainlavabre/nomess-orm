@@ -1,12 +1,12 @@
 <?php
 
 
-namespace Newwebsouth\Orm\Cache\Builder;
+namespace Nomess\Component\Orm\Cache\Builder;
 
 
-use Newwebsouth\Orm\Annotation\AnnotationParserInterface;
-use Newwebsouth\Orm\Cache\CacheHandlerInterface;
-use Newwebsouth\Orm\Exception\ORMException;
+use Nomess\Component\Orm\Annotation\AnnotationParserInterface;
+use Nomess\Component\Orm\Cache\CacheHandlerInterface;
+use Nomess\Component\Orm\Exception\ORMException;
 use ReflectionProperty;
 
 class EntityBuilder

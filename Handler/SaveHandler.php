@@ -1,17 +1,17 @@
 <?php
 
 
-namespace Newwebsouth\Orm\Handler;
+namespace Nomess\Component\Orm\Handler;
 
 
-use Newwebsouth\Orm\Driver\DriverHandlerInterface;
-use Newwebsouth\Orm\Exception\ORMException;
-use Newwebsouth\Orm\Handler\Dispatcher\DispatcherHandler;
-use Newwebsouth\Orm\QueryWriter\QueryCreateInterface;
-use Newwebsouth\Orm\QueryWriter\QueryDeleteInterface;
-use Newwebsouth\Orm\QueryWriter\QueryJoinInterface;
-use Newwebsouth\Orm\QueryWriter\QueryUpdateInterface;
-use Newwebsouth\Orm\Store;
+use Nomess\Component\Orm\Driver\DriverHandlerInterface;
+use Nomess\Component\Orm\Exception\ORMException;
+use Nomess\Component\Orm\Handler\Dispatcher\DispatcherHandler;
+use Nomess\Component\Orm\QueryWriter\QueryCreateInterface;
+use Nomess\Component\Orm\QueryWriter\QueryDeleteInterface;
+use Nomess\Component\Orm\QueryWriter\QueryJoinInterface;
+use Nomess\Component\Orm\QueryWriter\QueryUpdateInterface;
+use Nomess\Component\Orm\Store;
 
 class SaveHandler implements SaveHandlerInterface
 {

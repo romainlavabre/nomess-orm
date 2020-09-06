@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Newwebsouth\Orm\QueryWriter;
+namespace Nomess\Component\Orm\QueryWriter;
 
 
 interface QueryFreeInterface

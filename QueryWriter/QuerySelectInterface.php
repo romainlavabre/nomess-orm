@@ -1,10 +1,10 @@
 <?php
 
 
-namespace Newwebsouth\Orm\QueryWriter;
+namespace Nomess\Component\Orm\QueryWriter;
 
 
-use Newwebsouth\Orm\Exception\ORMException;
+use Nomess\Component\Orm\Exception\ORMException;
 use PDOStatement;
 
 interface QuerySelectInterface

@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Newwebsouth\Orm\Driver;
+namespace Nomess\Component\Orm\Driver;
 
 
 interface DriverHandlerInterface

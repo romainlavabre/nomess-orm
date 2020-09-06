@@ -1,13 +1,13 @@
 <?php
 
 
-namespace Newwebsouth\Orm;
+namespace Nomess\Component\Orm;
 
 
-use Newwebsouth\Orm\Handler\DeleteHandlerInterface;
-use Newwebsouth\Orm\Handler\FindHandlerInterface;
-use Newwebsouth\Orm\Handler\PersistHandlerInterface;
-use Newwebsouth\Orm\Handler\SaveHandlerInterface;
+use Nomess\Component\Orm\Handler\DeleteHandlerInterface;
+use Nomess\Component\Orm\Handler\FindHandlerInterface;
+use Nomess\Component\Orm\Handler\PersistHandlerInterface;
+use Nomess\Component\Orm\Handler\SaveHandlerInterface;
 
 class EntityManager implements EntityManagerInterface
 {

@@ -1,0 +1,12 @@
+{
+    "name": "nomess/orm",
+    "description": "Orm for nomess",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Romain Lavabre",
+            "email": "webmaster@newwebsouth.fr"
+        }
+    ],
+    "require": {}
+}

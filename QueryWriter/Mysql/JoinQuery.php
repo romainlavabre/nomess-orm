@@ -1,13 +1,13 @@
 <?php
 
 
-namespace Newwebsouth\Orm\QueryWriter\Mysql;
+namespace Nomess\Component\Orm\QueryWriter\Mysql;
 
 
-use Newwebsouth\Orm\Cache\CacheHandlerInterface;
-use Newwebsouth\Orm\Driver\DriverHandlerInterface;
-use Newwebsouth\Orm\QueryWriter\QueryJoinInterface;
-use Newwebsouth\Orm\Store;
+use Nomess\Component\Orm\Cache\CacheHandlerInterface;
+use Nomess\Component\Orm\Driver\DriverHandlerInterface;
+use Nomess\Component\Orm\QueryWriter\QueryJoinInterface;
+use Nomess\Component\Orm\Store;
 use PDOStatement;
 
 class JoinQuery implements QueryJoinInterface

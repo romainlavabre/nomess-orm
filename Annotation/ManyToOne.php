@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Newwebsouth\Orm\Annotation;
+namespace Nomess\Component\Orm\Annotation;
 
 /**
  * @Annotation

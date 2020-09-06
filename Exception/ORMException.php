@@ -1,6 +1,6 @@
 <?php
 
-namespace Newwebsouth\Orm\Exception;
+namespace Nomess\Component\Orm\Exception;
 
 use Exception;
 

@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Newwebsouth\Orm\Analyze;
+namespace Nomess\Component\Orm\Analyze;
 
 class Table extends AbstractAnalyze
 {

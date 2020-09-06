@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Newwebsouth\Orm\Cache\Builder;
+namespace Nomess\Component\Orm\Cache\Builder;
 
 
 class TableBuilder
