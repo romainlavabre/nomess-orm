@@ -1,4 +1,4 @@
-Nomess\Component\Orm\AnnotationParserInterface: Nomess\Component\Orm\Parser
+Nomess\Component\Orm\Annotation\AnnotationParserInterface: Nomess\Component\Orm\Annotation\Parser
 Nomess\Component\Orm\Cache\CacheHandlerInterface: Nomess\Component\Orm\Cache\CacheHandler
 Nomess\Component\Orm\Handler\DeleteHandlerInterface: Nomess\Component\Orm\Handler\DeleteHandler
 Nomess\Component\Orm\Handler\FindHandlerInterface: Nomess\Component\Orm\Handler\FindHandler
