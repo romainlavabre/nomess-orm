@@ -4,6 +4,7 @@
 namespace Nomess\Component\Orm\Analyze;
 
 
+use Nomess\Component\Config\ConfigStoreInterface;
 use Nomess\Component\Orm\Cache\CacheHandlerInterface;
 use Nomess\Component\Orm\Driver\DriverHandlerInterface;
 
@@ -23,9 +24,10 @@ class Column extends AbstractAnalyze
     
     public function __construct(
         DriverHandlerInterface $driverHandler,
-        CacheHandlerInterface $cacheHandler )
+        CacheHandlerInterface $cacheHandler,
+        ConfigStoreInterface $configStore )
     {
-        parent::__construct( $driverHandler );
+        parent::__construct( $driverHandler, $configStore );
         $this->cacheHandler = $cacheHandler;
     }
     
@@ -36,7 +38,7 @@ class Column extends AbstractAnalyze
             foreach( scandir( $directory ) as $file ) {
                 if( $file !== '.' && $file !== '..' && $file !== '.gitkeep'
                     && ( $reflectionClass = $this->getReflectionClass( $directory . $file, $file ) ) !== NULL
-                    && $reflectionClass->isInstantiable()) {
+                    && $reflectionClass->isInstantiable() ) {
                     $this->columns = array();
                     
                     $cache = $this->cacheHandler->getCache( $reflectionClass->getName() );
@@ -72,7 +74,7 @@ class Column extends AbstractAnalyze
         
         try {
             $this->driverHandler->getConnection()->query( $query )->execute();
-        }catch(\Throwable $th){
+        } catch( \Throwable $th ) {
         
         }
     }
@@ -84,7 +86,7 @@ class Column extends AbstractAnalyze
         $statement->execute();
         
         foreach( $statement->fetchAll() as $data ) {
-            if( !in_array( $data[0], $this->columns ) && !preg_match('/.+_id/', $data[0])) {
+            if( !in_array( $data[0], $this->columns ) && !preg_match( '/.+_id/', $data[0] ) ) {
                 
                 echo "Remove Column " . $data[0];
                 

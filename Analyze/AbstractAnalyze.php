@@ -3,23 +3,26 @@
 
 namespace Nomess\Component\Orm\Analyze;
 
+use Nomess\Component\Config\ConfigStoreInterface;
 use Nomess\Component\Orm\Driver\DriverHandlerInterface;
 
 class AbstractAnalyze
 {
-    private const PATH_ENTITY = ROOT . 'src/Entities/';
     protected DriverHandlerInterface $driverHandler;
+    private ConfigStoreInterface $configStore;
     
-    
-    public function __construct( DriverHandlerInterface $driverHandler )
+    public function __construct(
+        DriverHandlerInterface $driverHandler,
+        ConfigStoreInterface $configStore)
     {
         $this->driverHandler = $driverHandler;
+        $this->configStore = $configStore;
     }
     
     
     protected function directories(): array
     {
-        return $this->scanRecursive( self::PATH_ENTITY );
+        return $this->scanRecursive( $this->configStore->get(ConfigStoreInterface::DEFAULT_NOMESS)['general']['path']['default_entity'] );
     }
     
     

@@ -4,6 +4,7 @@
 namespace Nomess\Component\Orm\Analyze;
 
 
+use Nomess\Component\Config\ConfigStoreInterface;
 use Nomess\Component\Orm\Cache\CacheHandlerInterface;
 use Nomess\Component\Orm\Driver\DriverHandlerInterface;
 
@@ -20,9 +21,10 @@ class Relation extends AbstractAnalyze
     
     public function __construct(
         DriverHandlerInterface $driverHandler,
-        CacheHandlerInterface $cacheHandler )
+        CacheHandlerInterface $cacheHandler,
+        ConfigStoreInterface $configStore )
     {
-        parent::__construct( $driverHandler );
+        parent::__construct( $driverHandler, $configStore );
         $this->cacheHandler = $cacheHandler;
     }
     
@@ -33,7 +35,7 @@ class Relation extends AbstractAnalyze
             foreach( scandir( $directory ) as $file ) {
                 if( $file !== '.' && $file !== '..' && $file !== '.gitkeep'
                     && ( $reflectionClass = $this->getReflectionClass( $directory . $file, $file ) ) !== NULL
-                    && $reflectionClass->isInstantiable()) {
+                    && $reflectionClass->isInstantiable() ) {
                     
                     $cache              = $this->cacheHandler->getCache( $reflectionClass->getName() );
                     $this->joinTables[] = $cache[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME];
@@ -95,7 +97,7 @@ class Relation extends AbstractAnalyze
                 ALTER TABLE `' . $tableName . '`
                 ADD `' . $tableRelation . '_id` INT UNSIGNED NULL,
                 ADD KEY `fk_' . $tableRelation . '_' . $tableName . '` (`' . $tableRelation . '_id`),
-                ADD CONSTRAINT `c_' . $tableRelation .'_' . $tableName . '` FOREIGN KEY (`' . $tableRelation . '_id`) REFERENCES `' . $tableRelation . '` (`id`) ON DELETE SET NULL ON UPDATE SET NULL
+                ADD CONSTRAINT `c_' . $tableRelation . '_' . $tableName . '` FOREIGN KEY (`' . $tableRelation . '_id`) REFERENCES `' . $tableRelation . '` (`id`) ON DELETE SET NULL ON UPDATE SET NULL
             ' )->execute();
             } catch( \Throwable $th ) {
             }
@@ -119,7 +121,7 @@ class Relation extends AbstractAnalyze
                 try {
                     echo "Try to remove table " . $data[0] . "...";
                     $this->driverHandler->getConnection()->query( $query )->execute();
-                }catch(\Throwable $th){
+                } catch( \Throwable $th ) {
                     echo "fails";
                 }
                 
@@ -146,7 +148,7 @@ class Relation extends AbstractAnalyze
                 try {
                     echo "Try to remove column " . $data[0] . "...";
                     $this->driverHandler->getConnection()->query( $query )->execute();
-                }catch(\Throwable $e){
+                } catch( \Throwable $e ) {
                     echo "fails";
                 }
                 

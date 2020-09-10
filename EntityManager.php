@@ -9,13 +9,17 @@ use Nomess\Component\Orm\Handler\FindHandlerInterface;
 use Nomess\Component\Orm\Handler\PersistHandlerInterface;
 use Nomess\Component\Orm\Handler\SaveHandlerInterface;
 
-class EntityManager implements EntityManagerInterface
-{
+class EntityManager implements EntityManagerInterface, TransactionSubjectInterface
+{ 
     
     private FindHandlerInterface    $findHandler;
     private PersistHandlerInterface $persistHandler;
     private DeleteHandlerInterface  $deleteHandler;
     private SaveHandlerInterface    $saveHandler;
+    /**
+     * @var TransactionObserverInterface[]
+     */
+    private array $subscriber = array();
     
     
     public function __construct(
@@ -55,6 +59,20 @@ class EntityManager implements EntityManagerInterface
     
     public function save(): bool
     {
-        return $this->saveHandler->handle();
+        $this->notifySubscriber($status = $this->saveHandler->handle());
+        
+        return $status;
+    }
+    
+    public function addSubscriber(object $subscriber): void
+    {
+        $this->subscriber[] = $subscriber;
+    }
+    
+    public function notifySubscriber(bool $status): void
+    {
+        foreach($this->subscriber as $subscriber){
+            $subscriber->statusTransactionNotified($status);
+        }
     }
 }

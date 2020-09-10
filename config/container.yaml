@@ -4,4 +4,4 @@ Nomess\Component\Orm\Handler\DeleteHandlerInterface: Nomess\Component\Orm\Handle
 Nomess\Component\Orm\Handler\FindHandlerInterface: Nomess\Component\Orm\Handler\FindHandler
 Nomess\Component\Orm\Handler\PersistHandlerInterface: Nomess\Component\Orm\Handler\PersistHandler
 Nomess\Component\Orm\Handler\SaveHandlerInterface: Nomess\Component\Orm\Handler\SaveHandler
-
+Nomess\Component\Orm\TransactionSubjectInterface: Nomess\Component\Orm\EntityManager

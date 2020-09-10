@@ -46,6 +46,7 @@ class FindHandler implements FindHandlerInterface
             $object = NULL;
             if(!Store::repositoryHas($classname, $data['id'])) {
                 $this->setObject( $object = new $classname(), $data );
+    
                 Store::addToRepository( $object );
                 $this->execute( $classname, $object );
             }else{
@@ -155,9 +156,9 @@ class FindHandler implements FindHandlerInterface
             
             $query .= 'LEFT JOIN `' . $holderTable . '` J ON J.id = ' . $holderId . ' WHERE J.' . $targetTable . '_id = T.id';
         } elseif( $relationType === 'ManyToOne' ) {
-            $query .= 'LEFT JOIN `' . $targetTable . '` J ON J.id = ' . $holderId . ' WHERE J.' . $holderTable . '_id = T.id';
+            $query .= ' WHERE T.' . $holderTable . '_id = ' . $holderId;
         } else { // ManyToMany
-            $query .= 'LEFT JOIN `' . $relationTable . '` J ON J.' . $targetTable . '_id = ' . $holderId;
+            $query .= 'JOIN `' . $relationTable . '` J ON J.' . $holderTable . '_id = ' . $holderId;
         }
         
         return $query;
