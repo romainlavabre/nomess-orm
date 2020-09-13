@@ -4,7 +4,9 @@
 namespace Nomess\Component\Orm\Cache\Builder;
 
 
+use App\Entity\DataCustomer;
 use Nomess\Component\Orm\Annotation\AnnotationParserInterface;
+use Nomess\Component\Orm\Annotation\Parser;
 use Nomess\Component\Orm\Exception\ORMException;
 
 class RelationBuilder
@@ -203,6 +205,37 @@ class RelationBuilder
         }
         
         return $table1 . '_' . $table2;
+    }
+    
+    
+    /**
+     * Return the inversed property
+     *
+     * @param string $classname
+     * @param string $relationType
+     * @return string|null
+     * @throws ORMException
+     * @throws \ReflectionException
+     */
+    public function getInversed(string $classname, string $relationType): ?string
+    {
+        foreach((new \ReflectionClass( $classname))->getProperties() as $reflectionProperty){
+            $relationBuilder = new RelationBuilder( new Parser());
+            $relationBuilder->setReflectionProperty( $reflectionProperty);
+    
+            if($relationBuilder->isRelation()
+               && ($relationBuilder->getRelationClassname() === $this->reflectionProperty->getDeclaringClass()->getName())){
+    
+                $tmp = explode( 'To', $relationType);
+                $relationTypeInversed =  $tmp[1] . 'To' . $tmp[0];
+    
+                if($relationBuilder->getType() === $relationTypeInversed){
+                    return $reflectionProperty->getName();
+                }
+            }
+        }
+        
+        return NULL;
     }
     
     

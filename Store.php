@@ -97,8 +97,8 @@ class Store
     {
         $classname = get_class( $object );
         
-        return !array_key_exists( $classname, self::$toCreate )
-               || !in_array( $object, self::$toCreate[$classname], TRUE );
+        return array_key_exists( $classname, self::$toCreate )
+               && in_array( $object, self::$toCreate[$classname], TRUE );
     }
     
     
@@ -106,8 +106,8 @@ class Store
     {
         $classname = get_class( $object );
         
-        return !array_key_exists( $classname, self::$toUpdate )
-               || !in_array( $object, self::$toUpdate[$classname], TRUE );
+        return array_key_exists( $classname, self::$toUpdate )
+               && in_array( $object, self::$toUpdate[$classname], TRUE );
     }
     
     
@@ -115,8 +115,8 @@ class Store
     {
         $classname = get_class( $object );
         
-        return !array_key_exists( $classname, self::$toDelete )
-               || !in_array( $object, self::$toDelete[$classname], TRUE );
+        return array_key_exists( $classname, self::$toDelete )
+               && in_array( $object, self::$toDelete[$classname], TRUE );
     }
     
     

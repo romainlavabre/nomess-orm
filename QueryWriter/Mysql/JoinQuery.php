@@ -30,9 +30,15 @@ class JoinQuery implements QueryJoinInterface
      * @param object $object
      * @return PDOStatement
      */
-    public function getQuery( object $object ): PDOStatement
+    public function getQuery( object $object ): ?PDOStatement
     {
-        return $this->driverHandler->getConnection()->prepare( implode( '', $this->travel( $object ) ) );
+        $query = implode( '', $this->travel( $object ) );
+        
+        if(!empty($query)) {
+            return $this->driverHandler->getConnection()->prepare( $query );
+        }
+        
+        return NULL;
     }
     
     

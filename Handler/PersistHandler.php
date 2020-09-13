@@ -12,6 +12,7 @@ class PersistHandler implements PersistHandlerInterface
     
     public function handle( object $object ): void
     {
+        
         if( $this->isNewInstance( $object ) ) {
             Store::addToCreate( $object );
         }

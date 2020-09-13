@@ -13,6 +13,7 @@ interface CacheHandlerInterface
     public const ENTITY_RELATION_CLASSNAME  = 'entity_relation_classname';
     public const ENTITY_RELATION_TYPE       = 'entity_relation_type';
     public const ENTITY_RELATION_JOIN_TABLE = 'entity_relation_join_table';
+    public const ENTITY_RELATION_INVERSED   = 'entity_relation_inversed';
     public const TABLE_METADATA             = 'table_metadata';
     public const TABLE_NAME                 = 'table_table_name';
     

@@ -45,9 +45,10 @@ class EntityBuilder
         }
         
         return [
-            CacheHandlerInterface::ENTITY_RELATION_TYPE       => $this->relationBuilder->getType(),
-            CacheHandlerInterface::ENTITY_RELATION_CLASSNAME  => $this->relationBuilder->getRelationClassname(),
-            CacheHandlerInterface::ENTITY_RELATION_JOIN_TABLE => $this->relationBuilder->getJoinTable()
+            CacheHandlerInterface::ENTITY_RELATION_TYPE       => $relationType = $this->relationBuilder->getType(),
+            CacheHandlerInterface::ENTITY_RELATION_CLASSNAME  => $relationClassname = $this->relationBuilder->getRelationClassname(),
+            CacheHandlerInterface::ENTITY_RELATION_JOIN_TABLE => $this->relationBuilder->getJoinTable(),
+            CacheHandlerInterface::ENTITY_RELATION_INVERSED   => $this->relationBuilder->getInversed( $relationClassname, $relationType )
         ];
     }
     
@@ -67,14 +68,15 @@ class EntityBuilder
         return TRUE;
     }
     
+    
     public function isNullable(): bool
     {
         $instance = $this->reflectionProperty->getDeclaringClass()->newInstanceWithoutConstructor();
         
         try {
-            $this->reflectionProperty->setAccessible(TRUE);
-            $this->reflectionProperty->setValue($instance, NULL);
-        }catch(\Throwable $th){
+            $this->reflectionProperty->setAccessible( TRUE );
+            $this->reflectionProperty->setValue( $instance, NULL );
+        } catch( \Throwable $th ) {
             return FALSE;
         }
         

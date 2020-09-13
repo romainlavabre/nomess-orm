@@ -9,7 +9,7 @@ interface QueryJoinInterface
     
     /**
      * @param object $object
-     * @return \PDOStatement
+     * @return \PDOStatement|null
      */
-    public function getQuery( object $object ): \PDOStatement;
+    public function getQuery( object $object ): ?\PDOStatement;
 }

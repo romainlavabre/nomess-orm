@@ -45,7 +45,6 @@ class SaveHandler implements SaveHandlerInterface
     public function handle(): bool
     {
         $this->dispatcher->dispatch();
-        
         $connection = $this->driverHandler->getConnection();
         
         try {
@@ -69,11 +68,16 @@ class SaveHandler implements SaveHandlerInterface
             foreach( Store::getToUpdate() as $classname => &$array ) {
                 foreach( $array as &$object ) {
                     $this->queryUpdate->getQuery( $object )->execute();
+                    $this->toJoin[] = $object;
                 }
             }
             
             foreach( $this->toJoin as $object ) {
-                $this->queryJoin->getQuery( $object )->execute();
+                $statement = $this->queryJoin->getQuery( $object );
+                
+                if($statement !== NULL) {
+                    $statement->execute();
+                }
             }
             
             
