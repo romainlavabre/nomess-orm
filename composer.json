@@ -10,7 +10,8 @@
     ],
     "require": {
         "nomess/config": "*",
-        "nomess/cache": "*"
+        "nomess/cache": "*",
+        "ext-pdo": "*"
     },
     "autoload": {
         "psr-4": {

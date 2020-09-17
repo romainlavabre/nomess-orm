@@ -56,7 +56,7 @@ class Store
         if( !array_key_exists( $classname, self::$toUpdate ) ) {
             self::$toUpdate[$classname]   = array();
             self::$toUpdate[$classname][] = $object;
-        } elseif( !in_array( $object, self::$toUpdate[$classname], TRUE ) ) {
+        } elseif( !in_array( $object, self::$toUpdate[$classname], FALSE ) ) {
             self::$toUpdate[$classname][] = $object;
         }
     }

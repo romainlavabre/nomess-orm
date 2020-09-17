@@ -4,7 +4,6 @@
 namespace Nomess\Component\Orm\Cache\Builder;
 
 
-use App\Entity\DataCustomer;
 use Nomess\Component\Orm\Annotation\AnnotationParserInterface;
 use Nomess\Component\Orm\Annotation\Parser;
 use Nomess\Component\Orm\Exception\ORMException;
@@ -106,13 +105,13 @@ class RelationBuilder
             
             $shortClassName = $this->annotationParser->grossValue( 'var', $this->reflectionProperty );
             
-            if($shortClassName === NULL){
-                throw new ORMException('Impossible to resolving type of ' . $this->reflectionProperty->getName() .
-                ' in ' . $this->reflectionProperty->getDeclaringClass()->getName() . '::class missing @var annotation');
+            if( $shortClassName === NULL ) {
+                throw new ORMException( 'Impossible to resolving type of ' . $this->reflectionProperty->getName() .
+                                        ' in ' . $this->reflectionProperty->getDeclaringClass()->getName() . '::class missing @var annotation' );
             }
             
             $classname = $this->getRelationClassnameByVar(
-                str_replace(['|', '[', ']', 'null', 'NULL'], '', $this->annotationParser->grossValue( 'var', $this->reflectionProperty )),
+                str_replace( [ '|', '[', ']', 'null', 'NULL' ], '', $this->annotationParser->grossValue( 'var', $this->reflectionProperty ) ),
                 $this->reflectionProperty->getDeclaringClass() );
         }
         
@@ -217,19 +216,19 @@ class RelationBuilder
      * @throws ORMException
      * @throws \ReflectionException
      */
-    public function getInversed(string $classname, string $relationType): ?string
+    public function getInversed( string $classname, string $relationType ): ?string
     {
-        foreach((new \ReflectionClass( $classname))->getProperties() as $reflectionProperty){
-            $relationBuilder = new RelationBuilder( new Parser());
-            $relationBuilder->setReflectionProperty( $reflectionProperty);
-    
-            if($relationBuilder->isRelation()
-               && ($relationBuilder->getRelationClassname() === $this->reflectionProperty->getDeclaringClass()->getName())){
-    
-                $tmp = explode( 'To', $relationType);
-                $relationTypeInversed =  $tmp[1] . 'To' . $tmp[0];
-    
-                if($relationBuilder->getType() === $relationTypeInversed){
+        foreach( ( new \ReflectionClass( $classname ) )->getProperties() as $reflectionProperty ) {
+            $relationBuilder = new RelationBuilder( new Parser() );
+            $relationBuilder->setReflectionProperty( $reflectionProperty );
+            
+            if( $relationBuilder->isRelation()
+                && ( $relationBuilder->getRelationClassname() === $this->reflectionProperty->getDeclaringClass()->getName() ) ) {
+                
+                $tmp                  = explode( 'To', $relationType );
+                $relationTypeInversed = $tmp[1] . 'To' . $tmp[0];
+                
+                if( $relationBuilder->getType() === $relationTypeInversed ) {
                     return $reflectionProperty->getName();
                 }
             }

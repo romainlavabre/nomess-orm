@@ -42,6 +42,10 @@ class SaveHandler implements SaveHandlerInterface
     }
     
     
+    /**
+     * @return bool
+     * @throws ORMException
+     */
     public function handle(): bool
     {
         $this->dispatcher->dispatch();
@@ -72,16 +76,15 @@ class SaveHandler implements SaveHandlerInterface
                 }
             }
             
+            $connection->commit();
+            
             foreach( $this->toJoin as $object ) {
                 $statement = $this->queryJoin->getQuery( $object );
                 
-                if($statement !== NULL) {
+                if( $statement !== NULL ) {
                     $statement->execute();
                 }
             }
-            
-            
-            $connection->commit();
             
             Store::resetDeleteRepository();
             Store::resetCreateRepository();
@@ -90,21 +93,13 @@ class SaveHandler implements SaveHandlerInterface
         } catch( \Throwable $th ) {
             $connection->rollBack();
             
-            if(NOMESS_CONTEXT === 'DEV'){
-                throw new ORMException($th->getMessage() . ' in ' . $th->getFile() . ' line ' . $th->getLine());
+            if( NOMESS_CONTEXT === 'DEV' ) {
+                throw new ORMException( $th->getMessage() . ' in ' . $th->getFile() . ' line ' . $th->getLine() );
             }
             
             return FALSE;
         }
         
         return TRUE;
-    }
-    
-    
-    private function setToJoin( object $object ): void
-    {
-        if( !in_array( $object, $this->toJoin ) ) {
-            $this->toJoin[] = $object;
-        }
     }
 }

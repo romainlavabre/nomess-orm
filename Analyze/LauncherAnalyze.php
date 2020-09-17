@@ -2,16 +2,6 @@
 
 namespace Nomess\Component\Orm\Analyze;
 
-use Nomess\Component\Orm\Annotation\Parser;
-use Nomess\Component\Orm\Cache\Builder\CacheBuilder;
-use Nomess\Component\Orm\Cache\Builder\EntityBuilder;
-use Nomess\Component\Orm\Cache\Builder\RelationBuilder;
-use Nomess\Component\Orm\Cache\Builder\TableBuilder;
-use Nomess\Component\Orm\Cache\CacheHandler;
-use Nomess\Component\Orm\Cache\CacheHandlerInterface;
-use Nomess\Component\Orm\Driver\DriverHandlerInterface;
-use Nomess\Component\Orm\Driver\Pdo\PdoDriver;
-
 class LauncherAnalyze
 {
     

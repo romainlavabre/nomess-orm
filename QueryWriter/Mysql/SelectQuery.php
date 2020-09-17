@@ -10,7 +10,6 @@ use PDOStatement;
 class SelectQuery implements QuerySelectInterface
 {
     
-    private const CACHE_TARGET = 'cache_of_target';
     private const QUERY_SELECT = 'SELECT ';
     private const QUERY_FROM   = ' FROM ';
     private const QUERY_WHERE  = ' WHERE ';
@@ -34,7 +33,7 @@ class SelectQuery implements QuerySelectInterface
      * @param array $parameters
      * @return PDOStatement
      */
-    public function getQuery( string $classname, $idOrSql, array $parameters, ?string $lock_type): PDOStatement
+    public function getQuery( string $classname, $idOrSql, array $parameters, ?string $lock_type ): PDOStatement
     {
         $cache = $this->cacheHandler->getCache( $classname );
         

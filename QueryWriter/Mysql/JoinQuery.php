@@ -15,6 +15,7 @@ class JoinQuery implements QueryJoinInterface
     
     private DriverHandlerInterface $driverHandler;
     private CacheHandlerInterface  $cacheHandler;
+    private array                  $relationTreated = [];
     
     
     public function __construct(
@@ -34,7 +35,9 @@ class JoinQuery implements QueryJoinInterface
     {
         $query = implode( '', $this->travel( $object ) );
         
-        if(!empty($query)) {
+        if( !empty( $query ) ) {
+            var_dump( $query );
+            
             return $this->driverHandler->getConnection()->prepare( $query );
         }
         
@@ -50,27 +53,33 @@ class JoinQuery implements QueryJoinInterface
         foreach( $cacheHolder[CacheHandlerInterface::ENTITY_METADATA] as $propertyName => $array ) {
             $cacheTarget = NULL;
             
+            $instance1 = get_class( $object ) . '::' . ( $idHolder = $this->getId( $object ) ) . '_' . $propertyName;
+            
             if( $array[CacheHandlerInterface::ENTITY_RELATION] !== NULL
                 && $array[CacheHandlerInterface::ENTITY_RELATION][CacheHandlerInterface::ENTITY_RELATION_TYPE] === 'ManyToMany' ) {
+                
+                if( !Store::toCreateHas( $object ) ) {
+                    $queries[] = 'DELETE FROM `' .
+                                 $array[CacheHandlerInterface::ENTITY_RELATION][CacheHandlerInterface::ENTITY_RELATION_JOIN_TABLE] .
+                                 '` WHERE ' .
+                                 $cacheHolder[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME] .
+                                 '_id = ' . $idHolder . ';';
+                }
                 
                 foreach( $this->getValue( $object, $propertyName ) as $holded ) {
                     if( $cacheTarget === NULL ) {
                         $cacheTarget = $this->cacheHandler->getCache( get_class( $holded ) );
                     }
                     
-                    $queries[] = 'DELETE FROM `' .
-                                 $array[CacheHandlerInterface::ENTITY_RELATION][CacheHandlerInterface::ENTITY_RELATION_JOIN_TABLE] .
-                                 '` WHERE ' .
-                                 $cacheHolder[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME] .
-                                 '_id = ' . $this->getId( $object ) .
-                                 ' AND ' . $cacheTarget[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME] . '_id = ' .
-                                 $this->getId( $holded ) . ';';
+                    $instance2 = get_class( $holded ) . '::' . ( $idTarget = $this->getId( $holded ) ) . '_' . $propertyName;
                     
-                    $queries[] = 'INSERT INTO `' .
-                                 $array[CacheHandlerInterface::ENTITY_RELATION][CacheHandlerInterface::ENTITY_RELATION_JOIN_TABLE] .
-                                 '` (' . $cacheHolder[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME] . '_id, ' .
-                                 $cacheTarget[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME] . '_id) VALUES (' .
-                                 $this->getId( $object ) . ', ' . $this->getId( $holded ) . ');';
+                    if( !$this->isTreat( $instance1, $instance2 ) ) {
+                        $queries[] = 'INSERT INTO `' .
+                                     $array[CacheHandlerInterface::ENTITY_RELATION][CacheHandlerInterface::ENTITY_RELATION_JOIN_TABLE] .
+                                     '` (' . $cacheHolder[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME] . '_id, ' .
+                                     $cacheTarget[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME] . '_id) VALUES (' .
+                                     $idHolder . ', ' . $idTarget . ');';
+                    }
                 }
             }
         }
@@ -103,5 +112,11 @@ class JoinQuery implements QueryJoinInterface
         $reflectionProperty = Store::getReflection( get_class( $object ), 'id' );
         
         return $reflectionProperty->getValue( $object );
+    }
+    
+    
+    private function isTreat( string $instance1, ?string $instance2 ): bool
+    {
+        return array_key_exists( $instance1 . '_' . $instance2, $this->relationTreated );
     }
 }
