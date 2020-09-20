@@ -4,6 +4,7 @@
 namespace Nomess\Component\Orm\Handler\Dispatcher;
 
 
+use App\Entity\Stock;
 use Nomess\Component\Orm\Cache\CacheHandlerInterface;
 use Nomess\Component\Orm\Store;
 use Nomess\Helpers\ArrayHelper;
@@ -88,8 +89,10 @@ class DispatcherHandler
                     if( is_array( $values ) ) {
                         /** @var object $value */
                         foreach( $values as $value ) {
-                        
-                            if( ( $inversed = $metadata[CacheHandlerInterface::ENTITY_RELATION][CacheHandlerInterface::ENTITY_RELATION_INVERSED] ) !== NULL ) {
+                            
+                            if( ( $inversed = $metadata[CacheHandlerInterface::ENTITY_RELATION][CacheHandlerInterface::ENTITY_RELATION_INVERSED] ) !== NULL
+                                && $metadata[CacheHandlerInterface::ENTITY_RELATION][CacheHandlerInterface::ENTITY_RELATION_OWNER] ) {
+                                
                                 $this->setHolder(
                                     $object,
                                     $value,
@@ -103,7 +106,9 @@ class DispatcherHandler
                 } else {
                     
                     if( ( $value = $this->getValue( $object, $propertyName ) ) !== NULL ) {
-                        if( ( $inversed = $metadata[CacheHandlerInterface::ENTITY_RELATION][CacheHandlerInterface::ENTITY_RELATION_INVERSED] ) !== NULL ) {
+                        if( ( $inversed = $metadata[CacheHandlerInterface::ENTITY_RELATION][CacheHandlerInterface::ENTITY_RELATION_INVERSED] ) !== NULL
+                            && $metadata[CacheHandlerInterface::ENTITY_RELATION][CacheHandlerInterface::ENTITY_RELATION_OWNER] ) {
+                            
                             $this->setHolder(
                                 $object,
                                 $value,

@@ -181,13 +181,18 @@ class FindAll
             $tableRelation = $cache[CacheHandlerInterface::ENTITY_RELATION][CacheHandlerInterface::ENTITY_RELATION_JOIN_TABLE];
             
             if( $relationType === 'OneToOne' || $relationType === 'OneToMany' ) {
-                $statement = $this->driverHandler->getConnection()->prepare( 'SELECT * FROM `' . $tableTarget . '` WHERE ' . $tableHolder . '_id IS NOT NULL;' );
-                $statement->execute();
+                if($tableTarget === $tableHolder){
+                    $statement = $this->driverHandler->getConnection()->prepare( 'SELECT * FROM `' . $tableTarget . '`;' );
+                    $statement->execute();
+                }else {
+                    $statement = $this->driverHandler->getConnection()->prepare( 'SELECT T.* FROM `' . $tableTarget . '` T INNER JOIN ' . $tableHolder . ' J WHERE T.' . $tableHolder . '_id = J.id;' );
+                    $statement->execute();
+                }
             } elseif( $relationType === 'ManyToOne' ) {
-                $statement = $this->driverHandler->getConnection()->prepare( 'SELECT * FROM `' . $tableTarget . '` INNER JOIN ' . $tableHolder . ' J ON ' . $tableTarget . '_id IS NOT NULL;' );
+                $statement = $this->driverHandler->getConnection()->prepare( 'SELECT T.* FROM `' . $tableTarget . '` T INNER JOIN ' . $tableHolder . ' J ON J.' . $tableTarget . '_id = T.id;' );
                 $statement->execute();
             } else {
-                $statement = $this->driverHandler->getConnection()->prepare( 'SELECT * FROM `' . $tableTarget . '` T INNER JOIN ' . $tableRelation . ' J WHERE J.' . $tableTarget . '_id = T.id;' );
+                $statement = $this->driverHandler->getConnection()->prepare( 'SELECT T.* FROM `' . $tableTarget . '` T INNER JOIN ' . $tableRelation . ' J WHERE J.' . $tableTarget . '_id = T.id;' );
                 $statement->execute();
             }
         }

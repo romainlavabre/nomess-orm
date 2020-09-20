@@ -28,10 +28,25 @@ class FindHandler implements FindHandlerInterface
      */
     public function handle( string $classname, $idOrSql, array $parameters = [], ?string $lock_type )
     {
-        if( empty( $idOrSql ) ) {
-            return $this->findAll->find( $classname, $idOrSql );
+        $result = NULL;
+        
+        if( empty( $idOrSql ) || preg_match( '/^[0-9]+$/', $idOrSql )) {
+            $result = $this->findAll->find( $classname, $idOrSql );
+        } else {
+            $result = $this->findWithParameter->find( $classname, $idOrSql, $parameters, $lock_type );
+        }
+    
+    
+        if( preg_match( '/^[0-9]+$/', $idOrSql ) ) {
+            if( !empty( $result ) && is_array( $result)) {
+                return $result[0];
+            }
         }
         
-        return $this->findWithParameter->find( $classname, $idOrSql, $parameters, $lock_type );
+        if( !empty( $result ) ) {
+            return $result;
+        }
+        
+        return NULL;
     }
 }

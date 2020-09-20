@@ -48,7 +48,8 @@ class EntityBuilder
             CacheHandlerInterface::ENTITY_RELATION_TYPE       => $relationType = $this->relationBuilder->getType(),
             CacheHandlerInterface::ENTITY_RELATION_CLASSNAME  => $relationClassname = $this->relationBuilder->getRelationClassname(),
             CacheHandlerInterface::ENTITY_RELATION_JOIN_TABLE => $this->relationBuilder->getJoinTable(),
-            CacheHandlerInterface::ENTITY_RELATION_INVERSED   => $this->relationBuilder->getInversed( $relationClassname, $relationType )
+            CacheHandlerInterface::ENTITY_RELATION_INVERSED   => $inversed = $this->relationBuilder->getInversed( $relationClassname, $relationType ),
+            CacheHandlerInterface::ENTITY_RELATION_OWNER => $this->relationBuilder->isOwner(!empty( $inversed) ? new ReflectionProperty( $relationClassname, $inversed) : NULL, $relationClassname )
         ];
     }
     

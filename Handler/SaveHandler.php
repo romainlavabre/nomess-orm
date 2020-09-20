@@ -4,6 +4,7 @@
 namespace Nomess\Component\Orm\Handler;
 
 
+use App\Entity\Section;
 use Nomess\Component\Orm\Driver\DriverHandlerInterface;
 use Nomess\Component\Orm\Exception\ORMException;
 use Nomess\Component\Orm\Handler\Dispatcher\DispatcherHandler;
@@ -75,23 +76,25 @@ class SaveHandler implements SaveHandlerInterface
                     $this->toJoin[] = $object;
                 }
             }
-            
+    
             $connection->commit();
-            
+    
             foreach( $this->toJoin as $object ) {
                 $statement = $this->queryJoin->getQuery( $object );
-                
+    
                 if( $statement !== NULL ) {
                     $statement->execute();
                 }
             }
-            
+    
             Store::resetDeleteRepository();
             Store::resetCreateRepository();
             Store::resetUpdateRepository();
             $this->toJoin = array();
         } catch( \Throwable $th ) {
-            $connection->rollBack();
+            if($connection->inTransaction()){
+                $connection->rollBack();
+            }
             
             if( NOMESS_CONTEXT === 'DEV' ) {
                 throw new ORMException( $th->getMessage() . ' in ' . $th->getFile() . ' line ' . $th->getLine() );

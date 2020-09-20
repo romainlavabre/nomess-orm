@@ -7,6 +7,7 @@ namespace Nomess\Component\Orm\Cache\Builder;
 use Nomess\Component\Orm\Annotation\AnnotationParserInterface;
 use Nomess\Component\Orm\Annotation\Parser;
 use Nomess\Component\Orm\Exception\ORMException;
+use Nomess\Exception\MissingConfigurationException;
 
 class RelationBuilder
 {
@@ -15,6 +16,7 @@ class RelationBuilder
     private const MANY_TO_ONE  = 'ManyToOne';
     private const ONE_TO_MANY  = 'OneToMany';
     private const ONE_TO_ONE   = 'OneToOne';
+    private const OWNER        = 'Owner';
     private AnnotationParserInterface  $annotationParser;
     private TableBuilder               $tableBuilder;
     private \ReflectionProperty        $reflectionProperty;
@@ -235,6 +237,33 @@ class RelationBuilder
         }
         
         return NULL;
+    }
+    
+    
+    /**
+     * Look if property has owner annotation
+     *
+     * @return bool
+     */
+    public function isOwner( ?\ReflectionProperty $reflectionProperty, string $classname ): bool
+    {
+        $isOwner = $this->annotationParser->has( self::OWNER, $this->reflectionProperty );
+        
+        if( !$isOwner ) {
+            if( $reflectionProperty === NULL || !$this->annotationParser->has( self::OWNER, $reflectionProperty ) ) {
+                throw new MissingConfigurationException( 'No entity is entered as the owner of the relation ' .
+                                                         $this->reflectionProperty->getDeclaringClass()->getName() . '::class and ' .
+                                                         $classname . '::class, please, use the @Owner annotation' );
+            }
+        }else{
+            if( $reflectionProperty !== NULL && $this->annotationParser->has( self::OWNER, $reflectionProperty ) ) {
+                throw new MissingConfigurationException( 'A relation can have only one owner. For ' .
+                                                         $this->reflectionProperty->getDeclaringClass()->getName() . '::class and ' .
+                                                         $classname . '::class, please, use the @Owner annotation' );
+            }
+        }
+        
+        return $isOwner;
     }
     
     

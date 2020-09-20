@@ -36,8 +36,6 @@ class JoinQuery implements QueryJoinInterface
         $query = implode( '', $this->travel( $object ) );
         
         if( !empty( $query ) ) {
-            var_dump( $query );
-            
             return $this->driverHandler->getConnection()->prepare( $query );
         }
         
@@ -56,7 +54,8 @@ class JoinQuery implements QueryJoinInterface
             $instance1 = get_class( $object ) . '::' . ( $idHolder = $this->getId( $object ) ) . '_' . $propertyName;
             
             if( $array[CacheHandlerInterface::ENTITY_RELATION] !== NULL
-                && $array[CacheHandlerInterface::ENTITY_RELATION][CacheHandlerInterface::ENTITY_RELATION_TYPE] === 'ManyToMany' ) {
+                && $array[CacheHandlerInterface::ENTITY_RELATION][CacheHandlerInterface::ENTITY_RELATION_TYPE] === 'ManyToMany'
+                && $array[CacheHandlerInterface::ENTITY_RELATION][CacheHandlerInterface::ENTITY_RELATION_OWNER] ) {
                 
                 if( !Store::toCreateHas( $object ) ) {
                     $queries[] = 'DELETE FROM `' .
