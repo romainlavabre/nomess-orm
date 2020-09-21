@@ -78,7 +78,6 @@ class SelectQuery implements QuerySelectInterface
             return self::QUERY_WHERE . 'id = :id';
         } elseif( !empty( $idOrSql ) ) {
             $this->toBind = $parameters;
-            
             return self::QUERY_WHERE . $idOrSql;
         }
         

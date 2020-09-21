@@ -39,7 +39,7 @@ class CacheBuilder
                     CacheHandlerInterface::ENTITY_COLUMN   => $this->entityBuilder->getColumn(),
                     CacheHandlerInterface::ENTITY_TYPE     => $this->entityBuilder->getType(),
                     CacheHandlerInterface::ENTITY_RELATION => $this->entityBuilder->getRelation(),
-                    CacheHandlerInterface::ENTITY_IS_NULLABLE => $this->entityBuilder->isNullable()
+                    CacheHandlerInterface::ENTITY_IS_NULLABLE => $this->entityBuilder->isNullable($reflectionClass)
                 ];
             }
         }

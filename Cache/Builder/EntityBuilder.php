@@ -70,10 +70,9 @@ class EntityBuilder
     }
     
     
-    public function isNullable(): bool
+    public function isNullable(\ReflectionClass $reflectionClass): bool
     {
-        $instance = $this->reflectionProperty->getDeclaringClass()->newInstanceWithoutConstructor();
-        
+        $instance = $reflectionClass->newInstanceWithoutConstructor();
         try {
             $this->reflectionProperty->setAccessible( TRUE );
             $this->reflectionProperty->setValue( $instance, NULL );
