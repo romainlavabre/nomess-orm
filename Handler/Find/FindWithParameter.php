@@ -35,7 +35,7 @@ class FindWithParameter
         if( Store::repositoryHas( $classname, (int)$idOrSql ) ) {
             return Store::getOfRepository( $classname, $idOrSql );
         }
-        
+
         $statement = $this->querySelect->getQuery( $classname, $idOrSql, $parameters, $lock_type );
         $statement->execute();
         
@@ -199,8 +199,10 @@ class FindWithParameter
                 $reflectionProperty = Store::getReflection( $classname, $index );
                 
                 if( $reflectionProperty->getType()->getName() === 'array' ) {
-                    if( !is_array( $value ) ) {
+                    if( !is_string( $value ) ) {
                         $value = array();
+                    }else{
+                        $value = unserialize( $value);
                     }
                 }
                 

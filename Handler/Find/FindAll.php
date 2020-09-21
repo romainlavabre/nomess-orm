@@ -143,8 +143,10 @@ class FindAll
                 $reflectionProperty = Store::getReflection( $classname, $index );
                 
                 if( $reflectionProperty->getType()->getName() === 'array' ) {
-                    if( !is_array( $value ) ) {
+                    if( !is_string( $value ) ) {
                         $value = array();
+                    }else{
+                        $value = unserialize( $value);
                     }
                 }
                 
