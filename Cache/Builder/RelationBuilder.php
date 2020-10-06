@@ -4,11 +4,13 @@
 namespace Nomess\Component\Orm\Cache\Builder;
 
 
-use Nomess\Component\Orm\Annotation\AnnotationParserInterface;
-use Nomess\Component\Orm\Annotation\Parser;
 use Nomess\Component\Orm\Exception\ORMException;
+use Nomess\Component\Parser\AnnotationParserInterface;
 use Nomess\Exception\MissingConfigurationException;
 
+/**
+ * @author Romain Lavabre <webmaster@newwebsouth.fr>
+ */
 class RelationBuilder
 {
     
@@ -17,6 +19,13 @@ class RelationBuilder
     private const ONE_TO_MANY  = 'OneToMany';
     private const ONE_TO_ONE   = 'OneToOne';
     private const OWNER        = 'Owner';
+    private const ON_UPDATE    = 'OnUpdate';
+    private const ON_DELETE    = 'OnDelete';
+    private const SET_NULL     = 'SET NULL';
+    private const CASCADE      = 'CASCADE';
+    private const NO_ACTION    = 'NO ACTION';
+    private const RESTRICT     = 'RESTRICT';
+    private const SET_DEFAULT  = 'SET DEFAULT';
     private AnnotationParserInterface  $annotationParser;
     private TableBuilder               $tableBuilder;
     private \ReflectionProperty        $reflectionProperty;
@@ -221,7 +230,7 @@ class RelationBuilder
     public function getInversed( string $classname, string $relationType ): ?string
     {
         foreach( ( new \ReflectionClass( $classname ) )->getProperties() as $reflectionProperty ) {
-            $relationBuilder = new RelationBuilder( new Parser() );
+            $relationBuilder = new RelationBuilder( $this->annotationParser );
             $relationBuilder->setReflectionProperty( $reflectionProperty );
             
             if( $relationBuilder->isRelation()
@@ -243,27 +252,101 @@ class RelationBuilder
     /**
      * Look if property has owner annotation
      *
+     * @param \ReflectionProperty|null $reflectionProperty
+     * @param string $classname
      * @return bool
+     * @throws MissingConfigurationException
+     * @throws ORMException
      */
     public function isOwner( ?\ReflectionProperty $reflectionProperty, string $classname ): bool
     {
         $isOwner = $this->annotationParser->has( self::OWNER, $this->reflectionProperty );
         
-        if( !$isOwner ) {
+        if( !$isOwner && $this->getType() === 'OneToOne' ) {
             if( $reflectionProperty === NULL || !$this->annotationParser->has( self::OWNER, $reflectionProperty ) ) {
                 throw new MissingConfigurationException( 'No entity is entered as the owner of the relation ' .
                                                          $this->reflectionProperty->getDeclaringClass()->getName() . '::class and ' .
                                                          $classname . '::class, please, use the @Owner annotation' );
             }
-        }else{
-            if( $reflectionProperty !== NULL && $this->annotationParser->has( self::OWNER, $reflectionProperty ) ) {
+        } else {
+            if( $reflectionProperty !== NULL && $this->annotationParser->has( self::OWNER, $reflectionProperty )
+                && $isOwner ) {
+                
                 throw new MissingConfigurationException( 'A relation can have only one owner. For ' .
                                                          $this->reflectionProperty->getDeclaringClass()->getName() . '::class and ' .
-                                                         $classname . '::class, please, use the @Owner annotation' );
+                                                         $classname . '::class' );
             }
         }
         
         return $isOwner;
+    }
+    
+    
+    /**
+     * @return string
+     * @throws ORMException
+     */
+    public function onUpdate(): string
+    {
+        if( !$this->annotationParser->has( self::ON_UPDATE, $this->reflectionProperty ) ) {
+            return self::SET_NULL;
+        }
+        
+        $value = $this->annotationParser->getValue( self::ON_UPDATE, $this->reflectionProperty );
+        
+        if( isset( $value[0] ) ) {
+            if( isset( $value[0] ) ) {
+                if( mb_strtoupper( $value[0] ) === self::SET_NULL
+                    || mb_strtoupper( $value[0] ) === self::CASCADE
+                    || mb_strtoupper( $value[0] ) === self::RESTRICT
+                    || mb_strtoupper( $value[0] ) === self::NO_ACTION
+                    || mb_strtoupper( $value[0] ) === self::SET_DEFAULT ) {
+                    
+                    
+                    return $value[0];
+                }
+                
+                throw new ORMException( 'The annotation ' . self::ON_UPDATE . ' contains a invalid value in class "' .
+                                        $this->reflectionProperty->getDeclaringClass()->getName() . '" for property "' . $this->reflectionProperty->getName() . '", please, use "' .
+                                        self::SET_NULL . '", "' . self::CASCADE . '", "' . self::RESTRICT . '", "' . self::NO_ACTION . '", "' . self::SET_DEFAULT . '"' );
+            }
+        }
+        
+        throw new ORMException( 'The annotation ' . self::ON_UPDATE . ' is void or not readable in class "' .
+                                $this->reflectionProperty->getDeclaringClass()->getName() . '" for property "' . $this->reflectionProperty->getName() . '"' );
+    }
+    
+    
+    /**
+     * @return string
+     * @throws ORMException
+     */
+    public function onDelete(): string
+    {
+        if( !$this->annotationParser->has( self::ON_DELETE, $this->reflectionProperty ) ) {
+            return self::SET_NULL;
+        }
+        
+        $value = $this->annotationParser->getValue( self::ON_DELETE, $this->reflectionProperty );
+        
+        if( isset( $value[0] ) ) {
+            if( mb_strtoupper( $value[0] ) === self::SET_NULL
+                || mb_strtoupper( $value[0] ) === self::CASCADE
+                || mb_strtoupper( $value[0] ) === self::RESTRICT
+                || mb_strtoupper( $value[0] ) === self::NO_ACTION
+                || mb_strtoupper( $value[0] ) === self::SET_DEFAULT ) {
+                
+                
+                return $value[0];
+            }
+            
+            throw new ORMException( 'The annotation ' . self::ON_DELETE . ' contains a invalid value in class "' .
+                                    $this->reflectionProperty->getDeclaringClass()->getName() . '" for property "' . $this->reflectionProperty->getName() . '", please, use "' .
+                                    self::SET_NULL . '", "' . self::CASCADE . '", "' . self::RESTRICT . '", "' . self::NO_ACTION . '", "' . self::SET_DEFAULT . '"' );
+        }
+        
+        throw new ORMException( 'The annotation ' . self::ON_DELETE . ' is void or not readable in class "' .
+                                $this->reflectionProperty->getDeclaringClass()->getName() . '" for property "' . $this->reflectionProperty->getName() . '"' );
     }
     
     
@@ -290,6 +373,7 @@ class RelationBuilder
                 $found[] = trim( $output[0] );
             }
         }
+        
         if( empty( $found ) ) {
             if( class_exists( $reflectionClass->getNamespaceName() . '\\' . $classname ) ) {
                 return $reflectionClass->getNamespaceName() . '\\' . $classname;

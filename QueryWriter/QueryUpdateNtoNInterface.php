@@ -3,8 +3,10 @@
 
 namespace Nomess\Component\Orm\QueryWriter;
 
-
-interface QueryJoinInterface
+/**
+ * @author Romain Lavabre <webmaster@newwebsouth.fr>
+ */
+interface QueryUpdateNtoNInterface
 {
     
     /**

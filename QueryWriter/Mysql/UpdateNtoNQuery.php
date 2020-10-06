@@ -6,24 +6,28 @@ namespace Nomess\Component\Orm\QueryWriter\Mysql;
 
 use Nomess\Component\Orm\Cache\CacheHandlerInterface;
 use Nomess\Component\Orm\Driver\DriverHandlerInterface;
-use Nomess\Component\Orm\QueryWriter\QueryJoinInterface;
+use Nomess\Component\Orm\Entity\LazyLoadHandler;
+use Nomess\Component\Orm\QueryWriter\QueryUpdateNtoNInterface;
 use Nomess\Component\Orm\Store;
 use PDOStatement;
 
-class JoinQuery implements QueryJoinInterface
+class UpdateNtoNQuery implements QueryUpdateNtoNInterface
 {
     
     private DriverHandlerInterface $driverHandler;
     private CacheHandlerInterface  $cacheHandler;
+    private LazyLoadHandler        $lazyloader;
     private array                  $relationTreated = [];
     
     
     public function __construct(
         CacheHandlerInterface $cacheHandler,
-        DriverHandlerInterface $driverHandler )
+        DriverHandlerInterface $driverHandler,
+        LazyLoadHandler $lazyloader )
     {
         $this->cacheHandler  = $cacheHandler;
         $this->driverHandler = $driverHandler;
+        $this->lazyloader    = $lazyloader;
     }
     
     
@@ -53,9 +57,11 @@ class JoinQuery implements QueryJoinInterface
             
             $instance1 = get_class( $object ) . '::' . ( $idHolder = $this->getId( $object ) ) . '_' . $propertyName;
             
+            
             if( $array[CacheHandlerInterface::ENTITY_RELATION] !== NULL
                 && $array[CacheHandlerInterface::ENTITY_RELATION][CacheHandlerInterface::ENTITY_RELATION_TYPE] === 'ManyToMany'
-                && $array[CacheHandlerInterface::ENTITY_RELATION][CacheHandlerInterface::ENTITY_RELATION_OWNER] ) {
+                && $array[CacheHandlerInterface::ENTITY_RELATION][CacheHandlerInterface::ENTITY_RELATION_OWNER]
+                && !$this->lazyloader->isPropertyUnloaded( $object, $propertyName, $array ) ) {
                 
                 if( !Store::toCreateHas( $object ) ) {
                     $queries[] = 'DELETE FROM `' .

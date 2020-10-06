@@ -4,26 +4,28 @@
 namespace Nomess\Component\Orm\Handler;
 
 
-use App\Entity\Section;
 use Nomess\Component\Orm\Driver\DriverHandlerInterface;
 use Nomess\Component\Orm\Exception\ORMException;
 use Nomess\Component\Orm\Handler\Dispatcher\DispatcherHandler;
 use Nomess\Component\Orm\QueryWriter\QueryCreateInterface;
 use Nomess\Component\Orm\QueryWriter\QueryDeleteInterface;
-use Nomess\Component\Orm\QueryWriter\QueryJoinInterface;
 use Nomess\Component\Orm\QueryWriter\QueryUpdateInterface;
+use Nomess\Component\Orm\QueryWriter\QueryUpdateNtoNInterface;
 use Nomess\Component\Orm\Store;
 
+/**
+ * @author Romain Lavabre <webmaster@newwebsouth.fr>
+ */
 class SaveHandler implements SaveHandlerInterface
 {
     
-    private DispatcherHandler      $dispatcher;
-    private DriverHandlerInterface $driverHandler;
-    private QueryCreateInterface   $queryCreate;
-    private QueryUpdateInterface   $queryUpdate;
-    private QueryDeleteInterface   $queryDelete;
-    private QueryJoinInterface     $queryJoin;
-    private array                  $toJoin = array();
+    private DispatcherHandler        $dispatcher;
+    private DriverHandlerInterface   $driverHandler;
+    private QueryCreateInterface     $queryCreate;
+    private QueryUpdateInterface     $queryUpdate;
+    private QueryDeleteInterface     $queryDelete;
+    private QueryUpdateNtoNInterface $queryUpdateNtoN;
+    private array                    $toJoin = array();
     
     
     public function __construct(
@@ -32,14 +34,14 @@ class SaveHandler implements SaveHandlerInterface
         QueryCreateInterface $queryCreate,
         QueryUpdateInterface $queryUpdate,
         QueryDeleteInterface $queryDelete,
-        QueryJoinInterface $queryJoin )
+        QueryUpdateNtoNInterface $queryUpdateNtoN )
     {
-        $this->dispatcher    = $dispatcher;
-        $this->driverHandler = $driverHandler;
-        $this->queryCreate   = $queryCreate;
-        $this->queryUpdate   = $queryUpdate;
-        $this->queryDelete   = $queryDelete;
-        $this->queryJoin     = $queryJoin;
+        $this->dispatcher      = $dispatcher;
+        $this->driverHandler   = $driverHandler;
+        $this->queryCreate     = $queryCreate;
+        $this->queryUpdate     = $queryUpdate;
+        $this->queryDelete     = $queryDelete;
+        $this->queryUpdateNtoN = $queryUpdateNtoN;
     }
     
     
@@ -49,6 +51,7 @@ class SaveHandler implements SaveHandlerInterface
      */
     public function handle(): bool
     {
+        
         $this->dispatcher->dispatch();
         $connection = $this->driverHandler->getConnection();
         
@@ -61,7 +64,6 @@ class SaveHandler implements SaveHandlerInterface
                     $this->queryDelete->getQuery( $object )->execute();
                 }
             }
-            
             foreach( Store::getToCreate() as $classname => &$array ) {
                 foreach( $array as &$object ) {
                     $this->queryCreate->getQuery( $object )->execute();
@@ -76,23 +78,23 @@ class SaveHandler implements SaveHandlerInterface
                     $this->toJoin[] = $object;
                 }
             }
-    
+            
             $connection->commit();
-    
+            
             foreach( $this->toJoin as $object ) {
-                $statement = $this->queryJoin->getQuery( $object );
-    
+                $statement = $this->queryUpdateNtoN->getQuery( $object );
+                
                 if( $statement !== NULL ) {
                     $statement->execute();
                 }
             }
-    
+            
             Store::resetDeleteRepository();
             Store::resetCreateRepository();
             Store::resetUpdateRepository();
             $this->toJoin = array();
         } catch( \Throwable $th ) {
-            if($connection->inTransaction()){
+            if( $connection->inTransaction() ) {
                 $connection->rollBack();
             }
             

@@ -42,6 +42,7 @@ class Relation extends AbstractAnalyze
                     
                     foreach( $cache[CacheHandlerInterface::ENTITY_METADATA] as $propertyName => $array ) {
                         if( $array[CacheHandlerInterface::ENTITY_RELATION] !== NULL ) {
+                            
                             if( $array[CacheHandlerInterface::ENTITY_RELATION][CacheHandlerInterface::ENTITY_RELATION_JOIN_TABLE] !== NULL ) {
                                 $this->joinTables[] = $array[CacheHandlerInterface::ENTITY_RELATION][CacheHandlerInterface::ENTITY_RELATION_JOIN_TABLE];
                             }
@@ -49,7 +50,7 @@ class Relation extends AbstractAnalyze
                             $this->createRelation( $array, $cache[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME] );
                         }
                         
-                        $this->joinColumn[] = $array[CacheHandlerInterface::ENTITY_COLUMN];
+                        $this->joinColumn[] = $array[CacheHandlerInterface::ENTITY_COLUMN_NAME];
                     }
                     
                     $this->purgeForeignKey( $cache[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME], $cache );
@@ -67,12 +68,14 @@ class Relation extends AbstractAnalyze
         $tableRelation = $this->cacheHandler->getCache(
             $config[CacheHandlerInterface::ENTITY_RELATION][CacheHandlerInterface::ENTITY_RELATION_CLASSNAME]
         )[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME];
+        $onUpdate      = $config[CacheHandlerInterface::ENTITY_RELATION][CacheHandlerInterface::ENTITY_RELATION_ON_UPDATE];
+        $onDelete      = $config[CacheHandlerInterface::ENTITY_RELATION][CacheHandlerInterface::ENTITY_RELATION_ON_DELETE];
         
         if( $relationType === 'ManyToMany' ) {
             try {
                 $tableJoin = $config[CacheHandlerInterface::ENTITY_RELATION][CacheHandlerInterface::ENTITY_RELATION_JOIN_TABLE];
                 
-                echo "Try to create table " . $config[CacheHandlerInterface::ENTITY_RELATION][CacheHandlerInterface::ENTITY_RELATION_JOIN_TABLE] . " if not exists";
+                echo "Try to create table " . $config[CacheHandlerInterface::ENTITY_RELATION][CacheHandlerInterface::ENTITY_RELATION_JOIN_TABLE] . " if not exists\n";
                 $this->driverHandler->getConnection()
                                     ->query( 'CREATE TABLE IF NOT EXISTS `' . $tableJoin . '`
                                      (
@@ -85,22 +88,40 @@ class Relation extends AbstractAnalyze
                                         CONSTRAINT `c_' . $tableRelation . '_' . $tableJoin . '` FOREIGN KEY (`' . $tableRelation . '_id`) REFERENCES `' . $tableRelation . '` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
                                      )ENGINE=InnoDB DEFAULT CHARSET=utf8;' )->execute();
             } catch( \Throwable $th ) {
+                echo $th->getMessage() . "\n";
+            }
+        } else {
+            
+            if( $relationType === 'OneToOne' && !$config[CacheHandlerInterface::ENTITY_RELATION][CacheHandlerInterface::ENTITY_RELATION_OWNER] ) {
+                return;
             }
             
-            echo "\n";
-        } else {
             $this->joinColumn[] = $tableRelation . '_id';
             
-            try {
-                echo "Try to create column " . $tableName . "_id...";
-                $this->driverHandler->getConnection()->query( '
+            if( $relationType === 'OneToMany' || $relationType === 'OneToOne' ) {
+                try {
+                    echo "Try to create column " . $tableName . "_id for relation " . $tableName . " => " . $tableRelation . "...";
+                    $this->driverHandler->getConnection()->query( '
                 ALTER TABLE `' . $tableName . '`
                 ADD `' . $tableRelation . '_id` INT UNSIGNED NULL,
                 ADD KEY `fk_' . $tableRelation . '_' . $tableName . '` (`' . $tableRelation . '_id`),
-                ADD CONSTRAINT `c_' . $tableRelation . '_' . $tableName . '` FOREIGN KEY (`' . $tableRelation . '_id`) REFERENCES `' . $tableRelation . '` (`id`) ON DELETE SET NULL ON UPDATE SET NULL
+                ADD CONSTRAINT `c_' . $tableRelation . '_' . $tableName . '` FOREIGN KEY (`' . $tableRelation . '_id`) REFERENCES `' . $tableRelation . '` (`id`) ON DELETE ' . $onDelete . ' ON UPDATE ' . $onUpdate . '
             ' )->execute();
-            } catch( \Throwable $th ) {
+                } catch( \Throwable $th ) {
+                }
+            } elseif( $relationType === 'ManyToOne' ) {
+                try {
+                    echo "Try to create column " . $tableRelation . "_id for relation " . $tableRelation . " => " . $tableName . "...";
+                    $this->driverHandler->getConnection()->query( '
+                ALTER TABLE `' . $tableRelation . '`
+                ADD `' . $tableName . '_id` INT UNSIGNED NULL,
+                ADD KEY `fk_' . $tableName . '_' . $tableRelation . '` (`' . $tableName . '_id`),
+                ADD CONSTRAINT `c_' . $tableName . '_' . $tableRelation . '` FOREIGN KEY (`' . $tableName . '_id`) REFERENCES `' . $tableName . '` (`id`) ON DELETE ' . $onDelete . ' ON UPDATE ' . $onUpdate . '
+            ' )->execute();
+                } catch( \Throwable $th ) {
+                }
             }
+            
             
             echo "\n";
         }
@@ -122,7 +143,6 @@ class Relation extends AbstractAnalyze
                     echo "Try to remove table " . $data[0] . "...";
                     $this->driverHandler->getConnection()->query( $query )->execute();
                 } catch( \Throwable $th ) {
-                    echo "fails";
                 }
                 
                 echo "\n";
@@ -149,7 +169,6 @@ class Relation extends AbstractAnalyze
                     echo "Try to remove column " . $data[0] . "...";
                     $this->driverHandler->getConnection()->query( $query )->execute();
                 } catch( \Throwable $e ) {
-                    echo "fails";
                 }
                 
                 echo "\n";

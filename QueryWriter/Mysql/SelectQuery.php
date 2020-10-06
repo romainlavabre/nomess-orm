@@ -36,14 +36,12 @@ class SelectQuery implements QuerySelectInterface
     public function getQuery( string $classname, $idOrSql, array $parameters, ?string $lock_type ): PDOStatement
     {
         $cache = $this->cacheHandler->getCache( $classname );
-        
         $query = self::QUERY_SELECT . '*' .
                  $this->queryPartTableTarget( $cache ) .
                  $this->queryWhereClause( $idOrSql, $parameters, $cache ) . ' ' . $lock_type . ';';
-        
         $statement = $this->driverHandler->getConnection()->prepare( $query );
         $this->bindValue( $statement );
-        
+    
         return $statement;
     }
     
@@ -95,5 +93,7 @@ class SelectQuery implements QuerySelectInterface
         foreach( $this->toBind as $paramName => $value ) {
             $statement->bindValue( ':' . $paramName, $value );
         }
+        
+        $this->toBind = [];
     }
 }

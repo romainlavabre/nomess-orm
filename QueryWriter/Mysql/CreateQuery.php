@@ -7,15 +7,12 @@ use Nomess\Component\Orm\Driver\DriverHandlerInterface;
 use Nomess\Component\Orm\QueryWriter\QueryCreateInterface;
 use PDOStatement;
 
-/**
- * TODO Manage the ManyToMany relation
- */
+
 class CreateQuery extends AbstractAlterData implements QueryCreateInterface
 {
     
     private const QUERY_INSERT = 'INSERT INTO ';
     private const QUERY_VALUES = ' VALUES ';
-    private CacheHandlerInterface  $cacheHandler;
     private DriverHandlerInterface $driverHandler;
     
     
@@ -23,7 +20,7 @@ class CreateQuery extends AbstractAlterData implements QueryCreateInterface
         CacheHandlerInterface $cacheHandler,
         DriverHandlerInterface $driverHandler )
     {
-        $this->cacheHandler  = $cacheHandler;
+        parent::__construct( $cacheHandler );
         $this->driverHandler = $driverHandler;
     }
     
@@ -34,7 +31,7 @@ class CreateQuery extends AbstractAlterData implements QueryCreateInterface
      */
     public function getQuery( object $object ): PDOStatement
     {
-
+        
         $classname = get_class( $object );
         $cache     = $this->cacheHandler->getCache( $classname );
         
@@ -69,8 +66,8 @@ class CreateQuery extends AbstractAlterData implements QueryCreateInterface
         
         foreach( $cache[CacheHandlerInterface::ENTITY_METADATA] as $propertyName => $value ) {
             // Exclude relations
-            if($value[CacheHandlerInterface::ENTITY_RELATION] === NULL && $propertyName !== 'id') {
-                $line .= '`' . $value[CacheHandlerInterface::ENTITY_COLUMN] . '`, ';
+            if( $value[CacheHandlerInterface::ENTITY_RELATION] === NULL && $propertyName !== 'id' ) {
+                $line .= '`' . $value[CacheHandlerInterface::ENTITY_COLUMN_NAME] . '`, ';
             }
         }
         
@@ -91,9 +88,9 @@ class CreateQuery extends AbstractAlterData implements QueryCreateInterface
         foreach( $cache[CacheHandlerInterface::ENTITY_METADATA] as $propertyName => $value ) {
             
             // Exclude relations
-            if( $value[CacheHandlerInterface::ENTITY_RELATION] === NULL && $propertyName !== 'id') {
+            if( $value[CacheHandlerInterface::ENTITY_RELATION] === NULL && $propertyName !== 'id' ) {
                 
-                $columnName = $value[CacheHandlerInterface::ENTITY_COLUMN];
+                $columnName = $value[CacheHandlerInterface::ENTITY_COLUMN_NAME];
                 
                 $this->toBind[$propertyName] = $columnName;
                 $line                        .= ':' . $columnName . ', ';

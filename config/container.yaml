@@ -1,7 +1,0 @@
-Nomess\Component\Orm\Annotation\AnnotationParserInterface: Nomess\Component\Orm\Annotation\Parser
-Nomess\Component\Orm\Cache\CacheHandlerInterface: Nomess\Component\Orm\Cache\CacheHandler
-Nomess\Component\Orm\Handler\DeleteHandlerInterface: Nomess\Component\Orm\Handler\DeleteHandler
-Nomess\Component\Orm\Handler\FindHandlerInterface: Nomess\Component\Orm\Handler\FindHandler
-Nomess\Component\Orm\Handler\PersistHandlerInterface: Nomess\Component\Orm\Handler\PersistHandler
-Nomess\Component\Orm\Handler\SaveHandlerInterface: Nomess\Component\Orm\Handler\SaveHandler
-Nomess\Component\Orm\TransactionSubjectInterface: Nomess\Component\Orm\EntityManager

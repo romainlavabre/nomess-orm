@@ -4,8 +4,8 @@
 namespace Nomess\Component\Orm\Handler\Dispatcher;
 
 
-use App\Entity\Stock;
 use Nomess\Component\Orm\Cache\CacheHandlerInterface;
+use Nomess\Component\Orm\Entity\{LazyLoadHandler};
 use Nomess\Component\Orm\Store;
 use Nomess\Helpers\ArrayHelper;
 
@@ -18,12 +18,16 @@ class DispatcherHandler
     
     use ArrayHelper;
     
-    private CacheHandlerInterface $cacheHandler;
+    private CacheHandlerInterface                        $cacheHandler;
+    private LazyLoadHandler                              $lazyloader;
     
     
-    public function __construct( CacheHandlerInterface $cacheHandler )
+    public function __construct(
+        CacheHandlerInterface $cacheHandler,
+        LazyLoadHandler $lazyloader )
     {
         $this->cacheHandler = $cacheHandler;
+        $this->lazyloader   = $lazyloader;
     }
     
     
@@ -83,6 +87,11 @@ class DispatcherHandler
     {
         foreach( $cache[CacheHandlerInterface::ENTITY_METADATA] as $propertyName => $metadata ) {
             if( $metadata[CacheHandlerInterface::ENTITY_RELATION] !== NULL ) {
+                
+                if( $this->lazyloader->isPropertyUnloaded( $object, $propertyName, $metadata ) ) {
+                    continue;
+                }
+                
                 if( $metadata[CacheHandlerInterface::ENTITY_TYPE] === 'array' ) {
                     $values = $this->getValue( $object, $propertyName );
                     
@@ -90,30 +99,27 @@ class DispatcherHandler
                         /** @var object $value */
                         foreach( $values as $value ) {
                             
-                            if( ( $inversed = $metadata[CacheHandlerInterface::ENTITY_RELATION][CacheHandlerInterface::ENTITY_RELATION_INVERSED] ) !== NULL
-                                && $metadata[CacheHandlerInterface::ENTITY_RELATION][CacheHandlerInterface::ENTITY_RELATION_OWNER] ) {
+                            if( ( $inversed = $metadata[CacheHandlerInterface::ENTITY_RELATION][CacheHandlerInterface::ENTITY_RELATION_INVERSED] ) !== NULL ) {
                                 
-                                $this->setHolder(
+                                /*$this->setHolder(
                                     $object,
                                     $value,
                                     Store::getReflection( get_class( $value ), $inversed )
-                                );
+                                );*/
                             }
                             
                             $this->orientDispatcher( $value );
                         }
                     }
                 } else {
-                    
                     if( ( $value = $this->getValue( $object, $propertyName ) ) !== NULL ) {
-                        if( ( $inversed = $metadata[CacheHandlerInterface::ENTITY_RELATION][CacheHandlerInterface::ENTITY_RELATION_INVERSED] ) !== NULL
-                            && $metadata[CacheHandlerInterface::ENTITY_RELATION][CacheHandlerInterface::ENTITY_RELATION_OWNER] ) {
+                        if( ( $inversed = $metadata[CacheHandlerInterface::ENTITY_RELATION][CacheHandlerInterface::ENTITY_RELATION_INVERSED] ) !== NULL ) {
                             
-                            $this->setHolder(
+                            /*$this->setHolder(
                                 $object,
                                 $value,
                                 Store::getReflection( get_class( $value ), $inversed )
-                            );
+                            );*/
                         }
                         
                         $this->orientDispatcher( $value );
@@ -194,6 +200,7 @@ class DispatcherHandler
      * Add target inside holder
      *
      * @param object $target
+     * @param object $holder
      * @param \ReflectionProperty $reflectionPropertyOfHolder
      */
     private function setHolder( object $target, object $holder, \ReflectionProperty $reflectionPropertyOfHolder ): void

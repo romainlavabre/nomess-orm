@@ -4,22 +4,30 @@
 namespace Nomess\Component\Orm\Handler;
 
 
-use Nomess\Component\Orm\Handler\Find\FindAll;
-use Nomess\Component\Orm\Handler\Find\FindWithParameter;
+use Nomess\Component\Config\ConfigStoreInterface;
+use Nomess\Component\Orm\Handler\Find\FindBlock;
+use Nomess\Component\Orm\Handler\Find\FindLazy;
 
+/**
+ * @author Romain Lavabre <webmaster@newwebsouth.fr>
+ */
 class FindHandler implements FindHandlerInterface
 {
     
-    private FindAll            $findAll;
-    private FindWithParameter  $findWithParameter;
+    private const CONF_NAME = 'orm';
+    private FindBlock            $findBlock;
+    private FindLazy             $findLazy;
+    private ConfigStoreInterface $configStore;
     
     
     public function __construct(
-        FindAll $findAll,
-        FindWithParameter $findWithParameter )
+        FindBlock $findBlock,
+        FindLazy $findLazy,
+        ConfigStoreInterface $configStore )
     {
-        $this->findAll           = $findAll;
-        $this->findWithParameter = $findWithParameter;
+        $this->findBlock   = $findBlock;
+        $this->findLazy    = $findLazy;
+        $this->configStore = $configStore;
     }
     
     
@@ -28,25 +36,11 @@ class FindHandler implements FindHandlerInterface
      */
     public function handle( string $classname, $idOrSql, array $parameters = [], ?string $lock_type )
     {
-        $result = NULL;
-        
-        if( empty( $idOrSql ) || preg_match( '/^[0-9]+$/', $idOrSql )) {
-            $result = $this->findAll->find( $classname, $idOrSql );
-        } else {
-            $result = $this->findWithParameter->find( $classname, $idOrSql, $parameters, $lock_type );
-        }
-    
-    
-        if( preg_match( '/^[0-9]+$/', $idOrSql ) ) {
-            if( !empty( $result ) && is_array( $result)) {
-                return $result[0];
-            }
+        if( $this->configStore->get( self::CONF_NAME )['lazyload']['enable'] ) {
+            return $this->findLazy->find( $classname, $idOrSql, $parameters, $lock_type );
         }
         
-        if( !empty( $result ) ) {
-            return $result;
-        }
         
-        return NULL;
+        return $this->findBlock->find( $classname, $idOrSql, $parameters, $lock_type );
     }
 }

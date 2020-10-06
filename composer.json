@@ -11,7 +11,10 @@
     "require": {
         "nomess/config": "*",
         "nomess/cache": "*",
-        "ext-pdo": "*"
+        "nomess/parser": "*",
+        "nomess/cli": "*",
+        "ext-pdo": "*",
+        "ext-json": "*"
     },
     "autoload": {
         "psr-4": {

@@ -26,7 +26,7 @@ class PdoDriver implements DriverHandlerInterface
     
     public function __construct( ConfigStoreInterface $configStore )
     {
-        $this->config = $configStore->get( self::CONFIG_NAME );
+        $this->config = $configStore->get( self::CONFIG_NAME )['connection'];
     }
     
     

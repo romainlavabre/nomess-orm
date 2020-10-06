@@ -1,0 +1,13 @@
+connection:
+    server: mysql
+    host: localhost
+    port: 3306
+    dbname: dbname
+    encode: utf8
+    user: root
+    password: root
+
+lazyload:
+    enable: true
+    # Exclude class of lazyloading
+    exclude:
