@@ -6,6 +6,7 @@ namespace Nomess\Component\Orm;
 
 use Nomess\Component\Cli\Executable\ExecutableInterface;
 use Nomess\Component\Config\ConfigStoreInterface;
+use Nomess\Component\Config\Exception\ConfigurationNotFoundException;
 use Nomess\Component\Orm\Cache\CacheHandler;
 use Nomess\Component\Orm\Cache\CacheHandlerInterface;
 use Nomess\Component\Orm\Cli\DatabaseCreate;
@@ -42,8 +43,10 @@ use Nomess\Component\Orm\QueryWriter\QueryUpdateNtoNInterface;
  */
 class NomessInstaller implements \Nomess\Installer\NomessInstallerInterface
 {
+    
     private const CONFIG_NAME = 'orm';
     private ConfigStoreInterface $configStore;
+    
     
     public function __construct( ConfigStoreInterface $configStore )
     {
@@ -56,25 +59,30 @@ class NomessInstaller implements \Nomess\Installer\NomessInstallerInterface
      */
     public function container(): array
     {
-        $config = $this->configStore->get( self::CONFIG_NAME);
+        try {
+            $config = $this->configStore->get( self::CONFIG_NAME );
+        } catch( ConfigurationNotFoundException $e ) {
+            return [];
+        }
         
-        if($config['connection']['server'] === 'mysql'){
+        
+        if( $config['connection']['server'] === 'mysql' ) {
             return [
-                CacheHandlerInterface::class => CacheHandler::class,
-                DeleteHandlerInterface::class => DeleteHandler::class,
-                FindHandlerInterface::class => FindHandler::class,
-                PersistHandlerInterface::class => PersistHandler::class,
-                SaveHandlerInterface::class => SaveHandler::class,
+                CacheHandlerInterface::class       => CacheHandler::class,
+                DeleteHandlerInterface::class      => DeleteHandler::class,
+                FindHandlerInterface::class        => FindHandler::class,
+                PersistHandlerInterface::class     => PersistHandler::class,
+                SaveHandlerInterface::class        => SaveHandler::class,
                 TransactionSubjectInterface::class => EntityManager::class,
-                DriverHandlerInterface::class => PdoDriver::class,
-                EntityManagerInterface::class => EntityManager::class,
-                QueryCreateInterface::class => CreateQuery::class,
-                QueryUpdateInterface::class => UpdateQuery::class,
-                QueryDeleteInterface::class => DeleteQuery::class,
-                QuerySelectInterface::class => SelectQuery::class,
-                QueryUpdateNtoNInterface::class => UpdateNtoNQuery::class,
-                QueryFreeInterface::class => FreeQuery::class,
-                QueryJoinRelationInterface::class => SelectRelationQuery::class
+                DriverHandlerInterface::class      => PdoDriver::class,
+                EntityManagerInterface::class      => EntityManager::class,
+                QueryCreateInterface::class        => CreateQuery::class,
+                QueryUpdateInterface::class        => UpdateQuery::class,
+                QueryDeleteInterface::class        => DeleteQuery::class,
+                QuerySelectInterface::class        => SelectQuery::class,
+                QueryUpdateNtoNInterface::class    => UpdateNtoNQuery::class,
+                QueryFreeInterface::class          => FreeQuery::class,
+                QueryJoinRelationInterface::class  => SelectRelationQuery::class
             ];
         }
     }
@@ -95,21 +103,21 @@ class NomessInstaller implements \Nomess\Installer\NomessInstallerInterface
     public function cli(): array
     {
         return [
-            'nomess/orm' => NULL,
-            'database:create' => [
-                  ExecutableInterface::COMMENT => 'Create your database',
-                  ExecutableInterface::CLASSNAME => DatabaseCreate::class
+            'nomess/orm'       => NULL,
+            'database:create'  => [
+                ExecutableInterface::COMMENT   => 'Create your database',
+                ExecutableInterface::CLASSNAME => DatabaseCreate::class
             ],
             'database:install' => [
-                ExecutableInterface::COMMENT => 'Install your database',
+                ExecutableInterface::COMMENT   => 'Install your database',
                 ExecutableInterface::CLASSNAME => DatabaseUpdate::class
             ],
-            'database:update' => [
-                ExecutableInterface::COMMENT => 'Update your database',
+            'database:update'  => [
+                ExecutableInterface::COMMENT   => 'Update your database',
                 ExecutableInterface::CLASSNAME => DatabaseUpdate::class
             ],
-            'database:drop' => [
-                ExecutableInterface::COMMENT => 'Drop your database',
+            'database:drop'    => [
+                ExecutableInterface::COMMENT   => 'Drop your database',
                 ExecutableInterface::CLASSNAME => DatabaseDrop::class
             ]
         ];
