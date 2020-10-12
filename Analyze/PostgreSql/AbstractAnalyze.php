@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Nomess\Component\Orm\Analyze;
+namespace Nomess\Component\Orm\Analyze\PostgreSql;
 
 use Nomess\Component\Config\ConfigStoreInterface;
 use Nomess\Component\Orm\Driver\DriverHandlerInterface;

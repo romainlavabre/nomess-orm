@@ -7,5 +7,5 @@ namespace Nomess\Component\Orm\Handler;
 interface RawHandlerInterface
 {
     
-    public function handle( string $query, array $parameters = NULL );
+    public function handle( string $query, array $parameters );
 }

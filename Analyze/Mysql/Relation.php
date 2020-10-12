@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Nomess\Component\Orm\Analyze;
+namespace Nomess\Component\Orm\Analyze\Mysql;
 
 
 use Nomess\Component\Config\ConfigStoreInterface;

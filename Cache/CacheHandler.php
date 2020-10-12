@@ -3,7 +3,7 @@
 namespace Nomess\Component\Orm\Cache;
 
 
-use Nomess\Component\Orm\Cache\Builder\CacheBuilder;
+use Nomess\Component\Orm\Cache\Builder\Mysql\CacheBuilder;
 
 class CacheHandler implements CacheHandlerInterface
 {

@@ -2,16 +2,17 @@
 /** @noinspection PhpUndefinedConstantInspection */
 
 
-namespace Nomess\Component\Orm\Cache\Builder;
+namespace Nomess\Component\Orm\Cache\Builder\PostgreSql;
 
 
+use Nomess\Component\Orm\Cache\Builder\CacheBuilderInterface;
 use Nomess\Component\Orm\Cache\CacheHandlerInterface;
 use Nomess\Component\Parser\AnnotationParserInterface;
 
 /**
  * @author Romain Lavabre <webmaster@newwebsouth.fr>
  */
-class CacheBuilder
+class CacheBuilder implements CacheBuilderInterface
 {
     
     private EntityBuilder             $entityBuilder;
@@ -21,8 +22,10 @@ class CacheBuilder
     
     
     /**
-     * * @param EntityBuilder $entityBuilder
+     * *
+     * @param EntityBuilder $entityBuilder
      * @param TableBuilder $tableBuilder
+     * @param AnnotationParserInterface $annotationParser
      */
     public function __construct(
         EntityBuilder $entityBuilder,

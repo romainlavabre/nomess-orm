@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Nomess\Component\Orm\Analyze;
+namespace Nomess\Component\Orm\Analyze\PostgreSql;
 
 class Table extends AbstractAnalyze
 {
@@ -10,10 +10,10 @@ class Table extends AbstractAnalyze
     {
         foreach( $this->directories() as $directory ) {
             foreach( scandir( $directory ) as $file ) {
-               
+                
                 if( $file !== '.' && $file !== '..' && $file !== '.gitkeep'
                     && ( $reflectionClass = $this->getReflectionClass( $directory . $file, $file ) ) !== NULL
-                    && $reflectionClass->isInstantiable()) {
+                    && $reflectionClass->isInstantiable() ) {
                     
                     $this->createTable( $reflectionClass );
                 }
@@ -24,7 +24,7 @@ class Table extends AbstractAnalyze
     
     private function createTable( \ReflectionClass $reflectionClass ): void
     {
-        echo "Create table " . mb_strtolower( str_replace( [ '_', '-' ], '', $reflectionClass->getShortName() )) . " if not exists\n";
+        echo "Create table " . mb_strtolower( str_replace( [ '_', '-' ], '', $reflectionClass->getShortName() ) ) . " if not exists\n";
         
         $this->driverHandler->getConnection()
                             ->query( 'CREATE TABLE IF NOT EXISTS `' .

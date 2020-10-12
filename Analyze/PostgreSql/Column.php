@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Nomess\Component\Orm\Analyze;
+namespace Nomess\Component\Orm\Analyze\PostgreSql;
 
 
 use Nomess\Component\Config\ConfigStoreInterface;
@@ -198,8 +198,8 @@ class Column extends AbstractAnalyze
                 }
                 
                 $columnIndex = $config[CacheHandlerInterface::ENTITY_COLUMN_INDEX];
-                if( !empty( $item['Key'] ) && $columnIndex === NULL
-                    || empty( $item['Key'] ) && $columnIndex !== NULL
+                if( ( !empty( $item['Key'] ) && $columnIndex === NULL )
+                    || ( empty( $item['Key'] ) && $columnIndex !== NULL )
                     || ( !empty( $item['Key'] ) ? mb_strtolower( $item['Key'] ) : NULL ) !==
                        ( empty( self::PREFIX_INDEX ) ? self::PREFIX_INDEX[$columnIndex] : NULL ) ) {
                     

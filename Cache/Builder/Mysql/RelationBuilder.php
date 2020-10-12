@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Nomess\Component\Orm\Cache\Builder;
+namespace Nomess\Component\Orm\Cache\Builder\Mysql;
 
 
 use Nomess\Component\Orm\Exception\ORMException;

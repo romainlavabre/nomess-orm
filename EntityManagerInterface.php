@@ -4,6 +4,8 @@
 namespace Nomess\Component\Orm;
 
 
+use Nomess\Component\Orm\Handler\StoreHandlerInterface;
+
 interface EntityManagerInterface
 {
     
@@ -42,6 +44,26 @@ interface EntityManagerInterface
      * @return EntityManagerInterface
      */
     public function persist( object $object ): EntityManagerInterface;
+    
+    
+    /**
+     * Execute a arbitrary request
+     * The data will not be followed by ORM, if you want persist your object, use method "store"
+     *
+     * @param string $query     SQL query
+     * @param array $parameters Parameters to escape
+     * @return array
+     */
+    public function raw( string $query, array $parameters = [] ): array;
+    
+    
+    /**
+     * If you want manipulate the store of instances, call it
+     *
+     * @param object $object
+     * @return StoreHandlerInterface
+     */
+    public function getStore( object $object ): StoreHandlerInterface;
     
     
     /**
