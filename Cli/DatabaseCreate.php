@@ -4,19 +4,18 @@
 namespace Nomess\Component\Orm\Cli;
 
 
+use Nomess\Component\Cli\Executable\ExecutableInterface;
 use Nomess\Component\Cli\Interactive\InteractiveInterface;
 use Nomess\Component\Config\ConfigStoreInterface;
-use Nomess\Component\Orm\Driver\DriverHandlerInterface;
-use SebastianBergmann\CodeCoverage\Driver\Driver;
 
 /**
  * @author Romain Lavabre <webmaster@newwebsouth.fr>
  */
-class DatabaseCreate implements \Nomess\Component\Cli\Executable\ExecutableInterface
+class DatabaseCreate implements ExecutableInterface
 {
     
     private const CONFIG_NAME = 'orm';
-    private ConfigStoreInterface   $configStore;
+    private ConfigStoreInterface     $configStore;
     private InteractiveInterface     $interactiveHandler;
     
     
@@ -49,12 +48,10 @@ class DatabaseCreate implements \Nomess\Component\Cli\Executable\ExecutableInter
             
             if( $statment instanceof \PDOStatement ) {
                 $statment->execute();
-                $this->interactiveHandler->writeColorGreen( 'Database created');
-            }else{
-                $this->interactiveHandler->writeColorRed( 'An error occured');
+                $this->interactiveHandler->writeColorGreen( 'Database created' );
+            } else {
+                $this->interactiveHandler->writeColorRed( 'An error occured' );
             }
-            
-            
         } catch( \Throwable $throwable ) {
             echo $throwable->getMessage() . "\n";
         }
