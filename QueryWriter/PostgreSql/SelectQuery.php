@@ -10,8 +10,8 @@ use PDOStatement;
 class SelectQuery implements QuerySelectInterface
 {
     
-    private const QUERY_SELECT = 'SELECT ';
-    private const QUERY_FROM   = ' FROM ';
+    private const QUERY_SELECT = 'SELECT';
+    private const QUERY_FROM   = 'FROM';
     private const QUERY_WHERE  = ' WHERE ';
     private CacheHandlerInterface  $cacheHandler;
     private DriverHandlerInterface $driverHandler;
@@ -36,7 +36,7 @@ class SelectQuery implements QuerySelectInterface
     public function getQuery( string $classname, $idOrSql, array $parameters, ?string $lock_type ): PDOStatement
     {
         $cache     = $this->cacheHandler->getCache( $classname );
-        $query     = self::QUERY_SELECT . '*' .
+        $query     = self::QUERY_SELECT . ' * ' .
                      $this->queryPartTableTarget( $cache ) .
                      $this->queryWhereClause( $idOrSql, $parameters, $cache ) . ' ' . $lock_type . ';';
         $statement = $this->driverHandler->getConnection()->prepare( $query );
@@ -54,8 +54,8 @@ class SelectQuery implements QuerySelectInterface
      */
     private function queryPartTableTarget( array $cache ): string
     {
-        return self::QUERY_FROM .
-               $cache[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME];
+        return self::QUERY_FROM . ' "' .
+               $cache[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME] . '" ';
     }
     
     
@@ -73,11 +73,11 @@ class SelectQuery implements QuerySelectInterface
         if( is_int( $idOrSql ) ) {
             $this->toBind['id'] = $idOrSql;
             
-            return self::QUERY_WHERE . 'id = :id';
+            return self::QUERY_WHERE . ' id = :id';
         } elseif( !empty( $idOrSql ) ) {
             $this->toBind = $parameters;
             
-            return self::QUERY_WHERE . $idOrSql;
+            return self::QUERY_WHERE . ' ' . $idOrSql;
         }
         
         return '';

@@ -14,9 +14,9 @@ use PDOStatement;
 class UpdateQuery extends AbstractAlterData implements QueryUpdateInterface
 {
     
-    private const QUERY_UPDATE = 'UPDATE ';
-    private const QUERY_SET    = ' SET ';
-    private const QUERY_WHERE  = ' WHERE ';
+    private const QUERY_UPDATE = 'UPDATE';
+    private const QUERY_SET    = 'SET';
+    private const QUERY_WHERE  = 'WHERE';
     private DriverHandlerInterface   $driverHandler;
     private LazyLoadHandler          $lazyloader;
     
@@ -47,10 +47,12 @@ class UpdateQuery extends AbstractAlterData implements QueryUpdateInterface
             self::QUERY_UPDATE .
             $this->queryTable( $cache ) .
             self::QUERY_SET .
-            $this->queryColumnParam( $cache, $object ) .
+            $this->queryColumnParam( $cache, $object ) . ' ' . 
             $this->queryWhere( $cache, $object ) .
             ';'
         );
+        
+        var_dump( $statement);
         
         $this->bindValue( $statement, $object );
         
@@ -66,7 +68,7 @@ class UpdateQuery extends AbstractAlterData implements QueryUpdateInterface
      */
     private function queryTable( array $cache ): string
     {
-        return '`' . $cache[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME] . '`';
+        return ' "' . $cache[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME] . '" ';
     }
     
     
@@ -112,7 +114,7 @@ class UpdateQuery extends AbstractAlterData implements QueryUpdateInterface
                     $columnName = $array[CacheHandlerInterface::ENTITY_COLUMN_NAME];
                 }
                 
-                $line .= '`' . $columnName . '` = :' . $columnName . ', ';
+                $line .= '"' . $columnName . '" = :' . $columnName . ', ';
                 
                 $this->toBind[$propertyName] = $columnName;
             }
@@ -133,7 +135,7 @@ class UpdateQuery extends AbstractAlterData implements QueryUpdateInterface
     {
         $reflectionProperty = Store::getReflection( get_class( $object ), 'id' );
         
-        return self::QUERY_WHERE . 'id = ' .
+        return self::QUERY_WHERE . ' id = ' .
                $reflectionProperty->getValue( $object );
     }
 }

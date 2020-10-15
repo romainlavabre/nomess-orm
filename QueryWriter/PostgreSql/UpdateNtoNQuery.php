@@ -64,9 +64,9 @@ class UpdateNtoNQuery implements QueryUpdateNtoNInterface
                 && !$this->lazyloader->isPropertyUnloaded( $object, $propertyName, $array ) ) {
                 
                 if( !Store::toCreateHas( $object ) ) {
-                    $queries[] = 'DELETE FROM `' .
+                    $queries[] = 'DELETE FROM "' .
                                  $array[CacheHandlerInterface::ENTITY_RELATION][CacheHandlerInterface::ENTITY_RELATION_JOIN_TABLE] .
-                                 '` WHERE ' .
+                                 '" WHERE ' .
                                  $cacheHolder[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME] .
                                  '_id = ' . $idHolder . ';';
                 }
@@ -79,9 +79,9 @@ class UpdateNtoNQuery implements QueryUpdateNtoNInterface
                     $instance2 = get_class( $holded ) . '::' . ( $idTarget = $this->getId( $holded ) ) . '_' . $propertyName;
                     
                     if( !$this->isTreat( $instance1, $instance2 ) ) {
-                        $queries[] = 'INSERT INTO `' .
+                        $queries[] = 'INSERT INTO "' .
                                      $array[CacheHandlerInterface::ENTITY_RELATION][CacheHandlerInterface::ENTITY_RELATION_JOIN_TABLE] .
-                                     '` (' . $cacheHolder[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME] . '_id, ' .
+                                     '" (' . $cacheHolder[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME] . '_id, ' .
                                      $cacheTarget[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME] . '_id) VALUES (' .
                                      $idHolder . ', ' . $idTarget . ');';
                     }

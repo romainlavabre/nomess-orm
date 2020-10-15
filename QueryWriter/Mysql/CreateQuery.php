@@ -5,6 +5,7 @@ namespace Nomess\Component\Orm\QueryWriter\Mysql;
 use Nomess\Component\Orm\Cache\CacheHandlerInterface;
 use Nomess\Component\Orm\Driver\DriverHandlerInterface;
 use Nomess\Component\Orm\QueryWriter\QueryCreateInterface;
+use Nomess\Component\Orm\Store;
 use PDOStatement;
 
 
@@ -63,11 +64,23 @@ class CreateQuery extends AbstractAlterData implements QueryCreateInterface
     private function queryColumn( array $cache ): string
     {
         $line = ' (';
+        $isAddedToUpdate = FALSE;
         
         foreach( $cache[CacheHandlerInterface::ENTITY_METADATA] as $propertyName => $value ) {
             // Exclude relations
             if( $value[CacheHandlerInterface::ENTITY_RELATION] === NULL && $propertyName !== 'id' ) {
                 $line .= '`' . $value[CacheHandlerInterface::ENTITY_COLUMN_NAME] . '`, ';
+            }else{
+                if($isAddedToUpdate){
+                    continue;
+                }
+    
+                $reflectionProperty = Store::getReflection( get_class($object), $propertyName);
+    
+                if($reflectionProperty->isInitialized($object) && !empty( $reflectionProperty->getValue($object))){
+                    Store::addToUpdate($object);
+                    $isAddedToUpdate = TRUE;
+                }
             }
         }
         

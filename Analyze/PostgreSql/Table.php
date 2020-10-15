@@ -27,12 +27,12 @@ class Table extends AbstractAnalyze
         echo "Create table " . mb_strtolower( str_replace( [ '_', '-' ], '', $reflectionClass->getShortName() ) ) . " if not exists\n";
         
         $this->driverHandler->getConnection()
-                            ->query( 'CREATE TABLE IF NOT EXISTS `' .
+                            ->query( 'CREATE TABLE IF NOT EXISTS "' .
                                      mb_strtolower( str_replace( [ '_', '-' ], '', $reflectionClass->getShortName() ) ) .
-                                     '`
+                                     '"
                                      (
-                                        `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-                                        PRIMARY KEY (`id`)
-                                     )ENGINE=InnoDB DEFAULT CHARSET=utf8;' )->execute();
+                                        "id" SERIAL,
+                                        PRIMARY KEY ("id")
+                                     );' )->execute();
     }
 }

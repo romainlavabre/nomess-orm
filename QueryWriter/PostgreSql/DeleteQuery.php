@@ -43,7 +43,7 @@ class DeleteQuery implements QueryDeleteInterface
     
     private function queryTable( array $cache ): string
     {
-        return '`' . $cache[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME] . '`';
+        return '"' . $cache[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME] . '"';
     }
     
     

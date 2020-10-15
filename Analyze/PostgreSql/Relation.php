@@ -76,19 +76,30 @@ class Relation extends AbstractAnalyze
                 $tableJoin = $config[CacheHandlerInterface::ENTITY_RELATION][CacheHandlerInterface::ENTITY_RELATION_JOIN_TABLE];
                 
                 echo "Try to create table " . $config[CacheHandlerInterface::ENTITY_RELATION][CacheHandlerInterface::ENTITY_RELATION_JOIN_TABLE] . " if not exists\n";
+    
+    
                 $this->driverHandler->getConnection()
-                                    ->query( 'CREATE TABLE IF NOT EXISTS `' . $tableJoin . '`
+                                    ->query( 'CREATE TABLE IF NOT EXISTS "' . $tableJoin . '"
                                      (
-                                        `' . $tableName . '_id` INT UNSIGNED NOT NULL,
-                                        `' . $tableRelation . '_id` INT UNSIGNED NOT NULL,
-                                        UNIQUE KEY `UQ_' . $tableName . '_' . $tableJoin . '` (`' . $tableName . '_id`,`' . $tableRelation . '_id`),
-                                        KEY `fk_' . $tableName . '_' . $tableJoin . '` (`' . $tableName . '_id`),
-                                        KEY `fk_' . $tableRelation . '_' . $tableJoin . '` (`' . $tableRelation . '_id`),
-                                        CONSTRAINT `c_' . $tableName . '_' . $tableJoin . '` FOREIGN KEY (`' . $tableName . '_id`) REFERENCES `' . $tableName . '` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-                                        CONSTRAINT `c_' . $tableRelation . '_' . $tableJoin . '` FOREIGN KEY (`' . $tableRelation . '_id`) REFERENCES `' . $tableRelation . '` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-                                     )ENGINE=InnoDB DEFAULT CHARSET=utf8;' )->execute();
+                                        "' . $tableName . '_id" INT NOT NULL,
+                                        "' . $tableRelation . '_id" INT NOT NULL,
+                                        CONSTRAINT UQ_' . $tableName . '_' . $tableJoin . ' UNIQUE ("' . $tableName . '_id","' . $tableRelation . '_id"),
+                                        CONSTRAINT c_' . $tableName . '_' . $tableJoin . ' FOREIGN KEY ("' . $tableName . '_id") REFERENCES "' . $tableName . '" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+                                        CONSTRAINT c_' . $tableRelation . '_' . $tableJoin . ' FOREIGN KEY ("' . $tableRelation . '_id") REFERENCES "' . $tableRelation . '" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+                                     );' )
+                                    ->execute();
+    
+                $this->driverHandler->getConnection()
+                                    ->query( 'CREATE INDEX fk_' . $tableName . '_' . $tableJoin . ' ON "' . $tableJoin . '" ("' . $tableName . '_id");' )
+                                    ->execute();
+                
+                $this->driverHandler->getConnection()
+                                    ->query( 'CREATE INDEX fk_' . $tableRelation . '_' . $tableJoin . ' ON "' . $tableJoin . '" ("' . $tableRelation . '_id")' )
+                                    ->execute();
             } catch( \Throwable $th ) {
-                echo $th->getMessage() . "\n";
+                if(strpos( $th->getMessage(), 'Duplicate') === FALSE) {
+                    echo $th->getMessage() . "\n";
+                }
             }
         } else {
             
@@ -101,24 +112,44 @@ class Relation extends AbstractAnalyze
             if( $relationType === 'OneToMany' || $relationType === 'OneToOne' ) {
                 try {
                     echo "Try to create column " . $tableName . "_id for relation " . $tableName . " => " . $tableRelation . "...";
-                    $this->driverHandler->getConnection()->query( '
-                ALTER TABLE `' . $tableName . '`
-                ADD `' . $tableRelation . '_id` INT UNSIGNED NULL,
-                ADD KEY `fk_' . $tableRelation . '_' . $tableName . '` (`' . $tableRelation . '_id`),
-                ADD CONSTRAINT `c_' . $tableRelation . '_' . $tableName . '` FOREIGN KEY (`' . $tableRelation . '_id`) REFERENCES `' . $tableRelation . '` (`id`) ON DELETE ' . $onDelete . ' ON UPDATE ' . $onUpdate . '
-            ' )->execute();
+    
+    
+                    $this->driverHandler->getConnection()
+                                        ->query( '
+                ALTER TABLE "' . $tableName . '"
+                ADD COLUMN "' . $tableRelation . '_id" INT NULL,
+                ADD CONSTRAINT c_' . $tableRelation . '_' . $tableName . ' FOREIGN KEY ("' . $tableRelation . '_id") REFERENCES "' . $tableRelation . '" ("id") ON DELETE ' . $onDelete . ' ON UPDATE ' . $onUpdate . '
+            ' )
+                                        ->execute();
+                    
+                    $this->driverHandler->getConnection()
+                                        ->query( 'CREATE INDEX fk_' . $tableRelation . '_' . $tableName . ' ON "' . $tableName . '" ("' . $tableRelation . '_id");' )
+                                        ->execute();
                 } catch( \Throwable $th ) {
+                    if(strpos( $th->getMessage(), 'Duplicate') === FALSE) {
+                        echo $th->getMessage() . "\n";
+                    }
                 }
             } elseif( $relationType === 'ManyToOne' ) {
                 try {
                     echo "Try to create column " . $tableRelation . "_id for relation " . $tableRelation . " => " . $tableName . "...";
-                    $this->driverHandler->getConnection()->query( '
-                ALTER TABLE `' . $tableRelation . '`
-                ADD `' . $tableName . '_id` INT UNSIGNED NULL,
-                ADD KEY `fk_' . $tableName . '_' . $tableRelation . '` (`' . $tableName . '_id`),
-                ADD CONSTRAINT `c_' . $tableName . '_' . $tableRelation . '` FOREIGN KEY (`' . $tableName . '_id`) REFERENCES `' . $tableName . '` (`id`) ON DELETE ' . $onDelete . ' ON UPDATE ' . $onUpdate . '
-            ' )->execute();
+    
+    
+                    $this->driverHandler->getConnection()
+                                        ->query( '
+                ALTER TABLE "' . $tableRelation . '"
+                ADD COLUMN "' . $tableName . '_id" INT NULL,
+                ADD CONSTRAINT c_' . $tableName . '_' . $tableRelation . ' FOREIGN KEY ("' . $tableName . '_id") REFERENCES "' . $tableName . '" ("id") ON DELETE ' . $onDelete . ' ON UPDATE ' . $onUpdate . '
+            ' )
+                                        ->execute();
+                    
+                    $this->driverHandler->getConnection()
+                                        ->query( 'CREATE INDEX fk_' . $tableName . '_' . $tableRelation . ' ON "' . $tableRelation . '" ("' . $tableName . '_id")' )
+                                        ->execute();
                 } catch( \Throwable $th ) {
+                    if(strpos( $th->getMessage(), 'Duplicate') === FALSE) {
+                        echo $th->getMessage() . "\n";
+                    }
                 }
             }
             
@@ -131,13 +162,13 @@ class Relation extends AbstractAnalyze
     private function purgeJoinTable( string $database ): void
     {
         $statement = $this->driverHandler->getConnection()->query(
-            'SELECT table_name FROM INFORMATION_SCHEMA.TABLES WHERE table_schema = "' . $database . '";'
+            'SELECT table_name FROM INFORMATION_SCHEMA.TABLES WHERE table_schema = \'' . $database . '\';'
         );
         $statement->execute();
         
         foreach( $statement->fetchAll() as $data ) {
             if( !in_array( $data[0], $this->joinTables ) ) {
-                $query = 'DROP TABLE `' . $data[0] . '`;';
+                $query = 'DROP TABLE "' . $data[0] . '";';
                 
                 try {
                     echo "Try to remove table " . $data[0] . "...";
@@ -153,20 +184,18 @@ class Relation extends AbstractAnalyze
     
     private function purgeForeignKey( string $tableName, array $config ): void
     {
-        $statement = $this->driverHandler->getConnection()->query(
-            'DESCRIBE `' . $tableName . '`;'
-        );
+        $statement = $this->driverHandler->getConnection()->query( 'SELECT * FROM information_schema.columns WHERE table_name = \'' . $tableName . '\';' );
         $statement->execute();
         
         foreach( $statement->fetchAll() as $data ) {
-            if( !in_array( $data[0], $this->joinColumn ) ) {
-                $query = 'ALTER TABLE `' . $tableName . '`
-                DROP CONSTRAINT `c_' . str_replace( '_id', '', $data[0] ) . '_' . $tableName . '`,
-                DROP KEY `fk_' . str_replace( '_id', '', $data[0] ) . '_' . $tableName . '`,
-                DROP COLUMN `' . $data[0] . '`;';
+            if( !in_array( $data['column_name'], $this->joinColumn ) ) {
+                $query = 'ALTER TABLE "' . $tableName . '"
+                DROP CONSTRAINT c_' . str_replace( '_id', '', $data['column_name'] ) . '_' . $tableName . ',
+                DROP COLUMN "' . $data['column_name'] . '";';
                 
                 try {
-                    echo "Try to remove column " . $data[0] . "...";
+                    echo "Try to remove column " . $data['column_name'] . "...";
+                    $this->driverHandler->getConnection()->query( 'DROP INDEX fk_' . str_replace( '_id', '', $data['column_name'] ) . '_' . $tableName . ';' )->execute();
                     $this->driverHandler->getConnection()->query( $query )->execute();
                 } catch( \Throwable $e ) {
                 }

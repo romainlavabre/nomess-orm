@@ -63,6 +63,10 @@ class EntityManager implements EntityManagerInterface, TransactionSubjectInterfa
     
     public function save(): bool
     {
+        if(!isset( $this->saveHandler)){
+            $this->saveHandler = Container::getInstance()->get( SaveHandlerInterface::class);
+        }
+        
         $this->notifySubscriber( $status = $this->saveHandler->handle() );
         
         return $status;

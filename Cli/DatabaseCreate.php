@@ -44,8 +44,15 @@ class DatabaseCreate implements ExecutableInterface
         ) );
         
         try {
-            $statment = $db->query( 'CREATE DATABASE `' . $database . '`;' );
+            $query = NULL;
             
+            if($server === 'mysql'){
+                $query = 'CREATE DATABASE `' . $database . '`;';
+            }elseif($server === 'pgsql'){
+                $query = 'CREATE DATABASE "' . $database . '";';
+            }
+            
+            $statment = $db->query( $query);
             if( $statment instanceof \PDOStatement ) {
                 $statment->execute();
                 $this->interactiveHandler->writeColorGreen( 'Database created' );
@@ -53,6 +60,7 @@ class DatabaseCreate implements ExecutableInterface
                 $this->interactiveHandler->writeColorRed( 'An error occured' );
             }
         } catch( \Throwable $throwable ) {
+            var_dump( $throwable->getMessage());
             echo $throwable->getMessage() . "\n";
         }
     }

@@ -5,6 +5,7 @@ namespace Nomess\Component\Orm\QueryWriter\PostgreSql;
 use Nomess\Component\Orm\Cache\CacheHandlerInterface;
 use Nomess\Component\Orm\Driver\DriverHandlerInterface;
 use Nomess\Component\Orm\QueryWriter\QueryCreateInterface;
+use Nomess\Component\Orm\Store;
 use PDOStatement;
 
 
@@ -40,7 +41,7 @@ class CreateQuery extends AbstractAlterData implements QueryCreateInterface
                                              self::QUERY_INSERT .
                                              $this->queryTable( $cache ) .
                                              $this->queryColumn( $cache ) .
-                                             $this->queryParameters( $cache ) . ';'
+                                             $this->queryParameters( $cache, $object ) . ';'
                                          );
         $this->bindValue( $statement, $object );
         
@@ -50,7 +51,7 @@ class CreateQuery extends AbstractAlterData implements QueryCreateInterface
     
     private function queryTable( array $cache ): string
     {
-        return '`' . $cache[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME] . '`';
+        return '"' . $cache[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME] . '"';
     }
     
     
@@ -67,7 +68,7 @@ class CreateQuery extends AbstractAlterData implements QueryCreateInterface
         foreach( $cache[CacheHandlerInterface::ENTITY_METADATA] as $propertyName => $value ) {
             // Exclude relations
             if( $value[CacheHandlerInterface::ENTITY_RELATION] === NULL && $propertyName !== 'id' ) {
-                $line .= '`' . $value[CacheHandlerInterface::ENTITY_COLUMN_NAME] . '`, ';
+                $line .= '"' . $value[CacheHandlerInterface::ENTITY_COLUMN_NAME] . '", ';
             }
         }
         
@@ -81,9 +82,10 @@ class CreateQuery extends AbstractAlterData implements QueryCreateInterface
      * @param array $cache
      * @return string
      */
-    private function queryParameters( array $cache ): string
+    private function queryParameters( array $cache, object $object): string
     {
         $line = self::QUERY_VALUES . '(';
+        $isAddedToUpdate = FALSE;
         
         foreach( $cache[CacheHandlerInterface::ENTITY_METADATA] as $propertyName => $value ) {
             
@@ -94,6 +96,17 @@ class CreateQuery extends AbstractAlterData implements QueryCreateInterface
                 
                 $this->toBind[$propertyName] = $columnName;
                 $line                        .= ':' . $columnName . ', ';
+            }else{
+                if($isAddedToUpdate){
+                    continue;
+                }
+                
+                $reflectionProperty = Store::getReflection( get_class($object), $propertyName);
+                
+                if($reflectionProperty->isInitialized($object) && !empty( $reflectionProperty->getValue($object))){
+                    Store::addToUpdate($object);
+                    $isAddedToUpdate = TRUE;
+                }
             }
         }
         

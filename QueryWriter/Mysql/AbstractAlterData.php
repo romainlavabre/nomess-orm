@@ -61,7 +61,15 @@ abstract class AbstractAlterData
                 }
             } else {
                 if( $reflectionProperty->getType()->getName() === 'array' ) {
-                    $statement->bindValue( ':' . $columnName, serialize( array() ) );
+                    $value = [];
+    
+                    if( $this->cacheHandler->getCache( get_class( $object ) )[CacheHandlerInterface::ENTITY_METADATA][$reflectionProperty->getName()][CacheHandlerInterface::ENTITY_COLUMN_TYPE] === 'JSON' ) {
+                        $value = json_encode( [] );
+                    } else {
+                        $value = serialize( [] );
+                    }
+    
+                    $statement->bindValue( ':' . $columnName, $value );
                 } else {
                     $statement->bindValue( ':' . $columnName, NULL );
                 }

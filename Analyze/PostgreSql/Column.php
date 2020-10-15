@@ -14,27 +14,12 @@ class Column extends AbstractAnalyze
     private CacheHandlerInterface $cacheHandler;
     private array                 $columns = array();
     private const NOT_SUPPORTED_NULL = [
-        'TINYINT',
-        'SMALLINT',
-        'MEDIUMINT',
-        'INT',
-        'BIGINT',
-        'DECIMAL',
-        'FLOAT',
-        'DOUBLE',
-        'DATE',
-        'DATETIME',
-        'TIMESTAMP',
-        'TIME',
-        'YEARS',
-        'JSON'
+    
     ];
     private const PREFIX_INDEX       = [
         'PRIMARY'  => 'pri',
         'UNIQUE'   => 'uni',
-        'INDEX'    => 'mul',
-        'FULLTEXT' => 'mul',
-        'SPATIAL'  => 'mul'
+        'INDEX'    => 'mul'
     ];
     
     
@@ -83,35 +68,40 @@ class Column extends AbstractAnalyze
         if( $this->mustBePurged( $config[CacheHandlerInterface::ENTITY_IS_NULLABLE], $config[CacheHandlerInterface::ENTITY_COLUMN_TYPE], $config, $tableName ) ) {
             
             try {
-                $statement = $this->driverHandler->getConnection()->query( 'DESCRIBE `' . $tableName . '`;' );
-                $statement->execute();
+                $query = 'ALTER TABLE "' . $tableName . '" ' . "\n";
                 
-                $query = 'ALTER TABLE `' . $tableName . '` ' . "\n";
-                
-                $query .= 'DROP COLUMN `' . $config[CacheHandlerInterface::ENTITY_COLUMN_NAME] . '`;';
+                $query .= 'DROP COLUMN "' . $config[CacheHandlerInterface::ENTITY_COLUMN_NAME] . '";';
                 
                 $statement = $this->driverHandler->getConnection()->query( $query );
-                $statement->fetchAll();
             } catch( \Throwable $throwable ) {
             }
         }
         
+        $nullable = $config[CacheHandlerInterface::ENTITY_IS_NULLABLE] ? 'NULL' : 'NOT NULL';
+        $inform = FALSE;
+        
+        $statement = $this->driverHandler->getConnection()->query( 'SELECT COUNT(id) FROM "' . $tableName . '"');
+        
+        if($statement->fetchAll()[0]['count'] > 0){
+            if($nullable === 'NOT NULL'){
+                $inform = TRUE;
+            }
+            $nullable = 'NULL';
+        }
         
         $query = '
-        ALTER TABLE `' . $tableName . '`
-        ADD `' .
-                 $config[CacheHandlerInterface::ENTITY_COLUMN_NAME] . '` ' .
+        ALTER TABLE "' . $tableName . '"
+        ADD "' .
+                 $config[CacheHandlerInterface::ENTITY_COLUMN_NAME] . '" ' .
                  $config[CacheHandlerInterface::ENTITY_COLUMN_TYPE] .
                  ( ( ( $length = $config[CacheHandlerInterface::ENTITY_COLUMN_LENGTH] ) !== NULL ) ? '(' . $length . ')' : NULL ) .
-                 ' ' . $config[CacheHandlerInterface::ENTITY_COLUMN_OPTIONS] . ' ' .
-                 ( $config[CacheHandlerInterface::ENTITY_IS_NULLABLE] ? 'NULL' : 'NOT NULL' ) . ';
+                 ' ' . $config[CacheHandlerInterface::ENTITY_COLUMN_OPTIONS] . ' ' . $nullable . ';
         ';
         
         
         try {
-            
             $statement = $this->driverHandler->getConnection()->query( $query );
-            $statement->fetchAll();
+            echo "Unable to set column " .  $config[CacheHandlerInterface::ENTITY_COLUMN_NAME] . " to NOT NULL, because data exists. \n";
         } catch( \Throwable $th ) {
             if( strpos( $th->getMessage(), 'Duplicate' ) === FALSE ) {
                 echo $th->getMessage() . "\n";
@@ -120,10 +110,10 @@ class Column extends AbstractAnalyze
         
         if( $config[CacheHandlerInterface::ENTITY_COLUMN_INDEX] !== NULL ) {
             try {
-                $query = 'ALTER TABLE `' . $tableName . '` ADD ' . $config[CacheHandlerInterface::ENTITY_COLUMN_INDEX] . ' `index_' . self::PREFIX_INDEX[$config[CacheHandlerInterface::ENTITY_COLUMN_INDEX]] . '_' . $tableName . '_' . $config[CacheHandlerInterface::ENTITY_COLUMN_NAME] . '` (`' . $config[CacheHandlerInterface::ENTITY_COLUMN_NAME] . '`)';
+                $query = 'ALTER TABLE "' . $tableName . '"
+                ADD CONSTRAINT index_' . self::PREFIX_INDEX[$config[CacheHandlerInterface::ENTITY_COLUMN_INDEX]] . '_' . $tableName . '_' . $config[CacheHandlerInterface::ENTITY_COLUMN_NAME] . ' ' . $config[CacheHandlerInterface::ENTITY_COLUMN_INDEX] . ' ("' . $config[CacheHandlerInterface::ENTITY_COLUMN_NAME] . '")';
                 
                 $statement = $this->driverHandler->getConnection()->query( $query );
-                $statement->fetchAll();
             } catch( \Throwable $throwable ) {
             }
         }
@@ -132,25 +122,25 @@ class Column extends AbstractAnalyze
     
     private function purgeColumns( array $config, string $tableName ): void
     {
-        $statement = $this->driverHandler->getConnection()->query( 'DESCRIBE `' . $tableName . '`;' );
+        $statement = $this->driverHandler->getConnection()->query( 'SELECT * FROM information_schema.columns WHERE table_name = \'' . $tableName . '\'' );
         $statement->execute();
         
         foreach( $statement->fetchAll() as $data ) {
-            if( !in_array( $data[0], $this->columns ) && !preg_match( '/.+_id/', $data[0] ) ) {
+            if( !in_array( $data['column_name'], $this->columns ) && !preg_match( '/.+_id/', $data['column_name'] ) ) {
                 
-                echo "Remove Column " . $data[0];
+                echo "Remove Column " . $data['column_name'];
                 
                 $query = '
-                ALTER TABLE `' . $tableName . '`';
+                ALTER TABLE "' . $tableName . '"';
                 
                 if( $config[CacheHandlerInterface::ENTITY_COLUMN_INDEX] !== NULL ) {
-                    $query .= 'DROP INDEX `index_' . self::PREFIX_INDEX[$config[CacheHandlerInterface::ENTITY_COLUMN_INDEX]] . '_' . $tableName . '_' . $config[CacheHandlerInterface::ENTITY_COLUMN_NAME] . '` (`' . $config[CacheHandlerInterface::ENTITY_COLUMN_NAME] . '`)';
+                    $query .= 'DROP INDEX \'index_' . self::PREFIX_INDEX[$config[CacheHandlerInterface::ENTITY_COLUMN_INDEX]] . '_' . $tableName . '_' . $config[CacheHandlerInterface::ENTITY_COLUMN_NAME] . '\' ("' . $config[CacheHandlerInterface::ENTITY_COLUMN_NAME] . '")';
                 }
                 
-                $query .= 'DROP COLUMN `' . $data[0] . '`;';
+                $query .= 'DROP COLUMN "' . $data['column_name'] . '";';
                 
                 try {
-                    $this->driverHandler->getConnection()->query( $query )->execute();
+                    $this->driverHandler->getConnection()->query( $query );
                 } catch( \Throwable $throwable ) {
                     echo $throwable->getMessage() . "\n";
                 }
@@ -166,38 +156,39 @@ class Column extends AbstractAnalyze
         }
         
         
-        $statment = $this->driverHandler->getConnection()->query( 'DESCRIBE `' . $tableName . '`;' );
-        $statment->execute();
+        $statment = $this->driverHandler->getConnection()->query( 'SELECT * FROM information_schema.columns WHERE table_name = \'' . $tableName . '\';');
         
         $truncate = TRUE;
         
         foreach( $statment->fetchAll() as $item ) {
-            if( $item['Field'] === $config[CacheHandlerInterface::ENTITY_COLUMN_NAME] ) {
-                if( strpos( $item['Type'], mb_strtolower( $config[CacheHandlerInterface::ENTITY_COLUMN_TYPE] ) ) === FALSE ) {
+            if( $item['column_name'] === $config[CacheHandlerInterface::ENTITY_COLUMN_NAME] ) {
+               
+                if( strpos( $item['data_type'], mb_strtolower( $config[CacheHandlerInterface::ENTITY_COLUMN_TYPE] ) ) === FALSE ) {
                     break;
                 }
                 
                 if( is_array( $config[CacheHandlerInterface::ENTITY_COLUMN_OPTIONS] ) ) {
                     foreach( $config[CacheHandlerInterface::ENTITY_COLUMN_OPTIONS] as $option ) {
-                        if( strpos( $item['Type'], mb_strtolower( $option ) ) === FALSE ) {
+                        if( strpos( $item['data_type'], mb_strtolower( $option ) ) === FALSE ) {
                             break;
                         }
                     }
                 }
                 
-                if( preg_match( '/\([0-9]\.,\)/', $item['Type'] ) ) {
+                if( preg_match( '/\([0-9]\.,\)/', $item['data_type'] ) ) {
                     if( !empty( $config[CacheHandlerInterface::ENTITY_COLUMN_LENGTH] )
                         && strpos( $config[CacheHandlerInterface::ENTITY_COLUMN_LENGTH], $item['Type'] ) === FALSE ) {
                         break;
                     }
                 }
                 
-                if( ( $item['Null'] === 'YES' && !$config[CacheHandlerInterface::ENTITY_IS_NULLABLE] )
-                    || ( $item['Null'] === 'NO' && $config[CacheHandlerInterface::ENTITY_IS_NULLABLE] ) ) {
+                if( ( $item['is_nullable'] === 'YES' && !$config[CacheHandlerInterface::ENTITY_IS_NULLABLE] )
+                    || ( $item['is_nullable'] === 'NO' && $config[CacheHandlerInterface::ENTITY_IS_NULLABLE] ) ) {
                     break;
                 }
                 
-                $columnIndex = $config[CacheHandlerInterface::ENTITY_COLUMN_INDEX];
+                // TODO Update when contraint change
+                /*$columnIndex = $config[CacheHandlerInterface::ENTITY_COLUMN_INDEX];
                 if( ( !empty( $item['Key'] ) && $columnIndex === NULL )
                     || ( empty( $item['Key'] ) && $columnIndex !== NULL )
                     || ( !empty( $item['Key'] ) ? mb_strtolower( $item['Key'] ) : NULL ) !==
@@ -205,6 +196,7 @@ class Column extends AbstractAnalyze
                     
                     break;
                 }
+                */
                 
                 $truncate = FALSE;
                 break;

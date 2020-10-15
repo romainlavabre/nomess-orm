@@ -4,9 +4,11 @@
 namespace Nomess\Component\Orm\Cache\Builder\PostgreSql;
 
 
+use App\Entity\Admin;
 use Nomess\Component\Orm\Cache\CacheHandlerInterface;
 use Nomess\Component\Orm\Exception\ORMException;
 use Nomess\Component\Parser\AnnotationParserInterface;
+use Nomess\Component\Security\User\SecurityUser;
 use ReflectionProperty;
 
 /**
@@ -22,48 +24,49 @@ class EntityBuilder
     private const OPTIONS          = 'options';
     private const INDEX            = 'index';
     private const AVAILABLE_TYPE   = [
-        'string' => 'VARCHAR',
+        'string' => 'CHARACTER VARYING',
         'array'  => 'TEXT',
-        'int'    => 'INT',
-        'float'  => 'FLOAT',
-        'bool'   => 'TINYINT'
+        'int'    => 'INTEGER',
+        'float'  => 'DOUBLE PRECISION',
+        'double' => 'DOUBLE PRECISION',
+        'bool'   => 'BOOLEAN'
     ];
     private const AVAILABLE_LENGTH = [
-        'CHAR'       => 1,
-        'VARCHAR'    => 255,
-        'TINYTEXT'   => NULL,
-        'TEXT'       => NULL,
-        'MEDIUMTEXT' => NULL,
-        'LONGTEXT'   => NULL,
-        'JSON'       => NULL,
-        'TINYINT'    => 1,
-        'SMALLINT'   => 5,
-        'MEDIUMINT'  => 8,
-        'INT'        => 11,
-        'BIGINT'     => NULL,
-        'DECIMAL'    => '10,0',
-        'FLOAT'      => '10,2',
-        'DOUBLE'     => '10,2',
-        'DATE'       => NULL,
-        'DATETIME'   => NULL,
-        'TIMESTAMP'  => NULL,
-        'TIME'       => NULL,
-        'YEARS'      => NULL,
-        'BIT'        => 1,
-        'BINARY'     => 5,
-        'VARBINARY'  => 8,
-        'TINYBLOB'   => NULL,
-        'BLOB'       => NULL,
-        'MEDIUMBLOB' => NULL,
-        'LONGBLOB'   => NULL
+        'CHARACTER'         => 1,
+        'CHARACTER VARYING' => 255,
+        'TEXT'              => NULL,
+        'TSQUERY'           => NULL,
+        'TSVECTOR'          => NULL,
+        'UUID'              => NULL,
+        'XML'               => NULL,
+        'JSON'              => NULL,
+        'JSONB'             => NULL,
+        'SMALLINT'          => NULL,
+        'INTEGER'           => NULL,
+        'BIGINT'            => NULL,
+        'REAL'            => NULL,
+        'NUMERIC'           => NULL,
+        'DOUBLE PRECISION'  => NULL,
+        'MONEY'  => NULL,
+        'BOOLEAN' => NULL,
+        'DATE'              => NULL,
+        'DATETIME'          => NULL,
+        'TIMESTAMP'         => NULL,
+        'TIMESTAMPTZ'       => NULL,
+        'INTERVAL'          => NULL,
+        'BIT'               => 1,
+        'BINARY'            => 5,
+        'VARBINARY'         => 8,
+        'TINYBLOB'          => NULL,
+        'BLOB'              => NULL,
+        'MEDIUMBLOB'        => NULL,
+        'LONGBLOB'          => NULL
     
     ];
     private const AVAILABLE_INDEX  = [
         'PRIMARY',
         'UNIQUE',
-        'INDEX',
-        'FULLTEXT',
-        'SPATIAL'
+        'INDEX'
     ];
     private AnnotationParserInterface $annotationParser;
     private RelationBuilder           $relationBuilder;
@@ -162,14 +165,6 @@ class EntityBuilder
             } else {
                 $options = '';
             }
-        }
-        
-        if( $options === NULL
-            && ( strpos( 'INT', $columnType = $this->getColumnType() ) !== FALSE
-                 || $columnType === 'FLOAT'
-                 || $columnType === 'DOUBLE' )
-        ) {
-            $options = 'UNSIGNED';
         }
         
         return !empty( $options ) ? $options : NULL;

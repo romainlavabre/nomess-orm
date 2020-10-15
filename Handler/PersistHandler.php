@@ -15,6 +15,7 @@ class PersistHandler implements PersistHandlerInterface
         
         if( $this->isNewInstance( $object ) ) {
             Store::addToCreate( $object );
+            return;
         }
         
         Store::addToUpdate( $object );

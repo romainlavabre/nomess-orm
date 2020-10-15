@@ -10,5 +10,9 @@ namespace Nomess\Component\Orm\Annotation;
  */
 class Column
 {
-
+    private string $name;
+    private string $type;
+    private string $length;
+    private array $options;
+    private string $index;
 }

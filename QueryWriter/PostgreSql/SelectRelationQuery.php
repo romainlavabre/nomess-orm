@@ -72,19 +72,19 @@ class SelectRelationQuery implements QueryJoinRelationInterface
         $holderTable = $holderCache[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME];
         $targetTable = $targetCache[CacheHandlerInterface::TABLE_METADATA][CacheHandlerInterface::TABLE_NAME];
         
-        $query = 'SELECT T.* FROM `' . $targetTable . '` T ';
+        $query = 'SELECT T.* FROM "' . $targetTable . '" T ';
         
         if( $relationType === self::ONE_TO_ONE ) {
             if( !$holderCache[CacheHandlerInterface::ENTITY_METADATA][$holderProperty][CacheHandlerInterface::ENTITY_RELATION][CacheHandlerInterface::ENTITY_RELATION_OWNER] ) {
                 return $query . 'WHERE T.' . $holderTable . '_id = ' . $holderId;
             }
             
-            return $query . ' INNER JOIN ' . $holderTable . ' J ON J.id = ' . $holderId . ' WHERE J.' . $targetTable . '_id = T.id';
+            return $query . ' INNER JOIN "' . $holderTable . '" J ON J.id = ' . $holderId . ' WHERE J.' . $targetTable . '_id = T.id';
         }
         
         if( $relationType === self::ONE_TO_MANY ) {
             
-            return $query . 'LEFT JOIN `' . $holderTable . '` J ON J.id = ' . $holderId . ' WHERE J.' . $targetTable . '_id = T.id';
+            return $query . 'LEFT JOIN "' . $holderTable . '" J ON J.id = ' . $holderId . ' WHERE J.' . $targetTable . '_id = T.id';
         }
         
         if( $relationType === self::MANY_TO_ONE ) {
@@ -93,6 +93,6 @@ class SelectRelationQuery implements QueryJoinRelationInterface
         }
         
         // ManyToMany
-        return $query . 'INNER JOIN `' . $relationTable . '` J ON J.' . $holderTable . '_id = ' . $holderId . ' WHERE J.' . $targetTable . '_id = T.id';
+        return $query . 'INNER JOIN "' . $relationTable . '" J ON J.' . $holderTable . '_id = ' . $holderId . ' WHERE J.' . $targetTable . '_id = T.id';
     }
 }

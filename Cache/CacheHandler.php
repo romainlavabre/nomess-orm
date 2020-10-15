@@ -3,19 +3,20 @@
 namespace Nomess\Component\Orm\Cache;
 
 
+use Nomess\Component\Orm\Cache\Builder\CacheBuilderInterface;
 use Nomess\Component\Orm\Cache\Builder\Mysql\CacheBuilder;
 
 class CacheHandler implements CacheHandlerInterface
 {
     
     private const CACHE_NAME = 'orm';
-    private CacheBuilder                                  $cacheBuilder;
+    private CacheBuilderInterface                         $cacheBuilder;
     private \Nomess\Component\Cache\CacheHandlerInterface $cacheHandler;
     private array                                         $cache = array();
     
     
     public function __construct(
-        CacheBuilder $cacheBuilder,
+        CacheBuilderInterface $cacheBuilder,
         \Nomess\Component\Cache\CacheHandlerInterface $cacheHandler )
     {
         $this->cacheBuilder = $cacheBuilder;
