@@ -86,7 +86,7 @@ class Relation extends AbstractAnalyze
                                         KEY `fk_' . $tableRelation . '_' . $tableJoin . '` (`' . $tableRelation . '_id`),
                                         CONSTRAINT `c_' . $tableName . '_' . $tableJoin . '` FOREIGN KEY (`' . $tableName . '_id`) REFERENCES `' . $tableName . '` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
                                         CONSTRAINT `c_' . $tableRelation . '_' . $tableJoin . '` FOREIGN KEY (`' . $tableRelation . '_id`) REFERENCES `' . $tableRelation . '` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-                                     )ENGINE=InnoDB DEFAULT CHARSET=utf8;' )->execute();
+                                     )ENGINE=InnoDB DEFAULT CHARSET=utf8;' );
             } catch( \Throwable $th ) {
                 echo $th->getMessage() . "\n";
             }
@@ -106,7 +106,7 @@ class Relation extends AbstractAnalyze
                 ADD `' . $tableRelation . '_id` INT UNSIGNED NULL,
                 ADD KEY `fk_' . $tableRelation . '_' . $tableName . '` (`' . $tableRelation . '_id`),
                 ADD CONSTRAINT `c_' . $tableRelation . '_' . $tableName . '` FOREIGN KEY (`' . $tableRelation . '_id`) REFERENCES `' . $tableRelation . '` (`id`) ON DELETE ' . $onDelete . ' ON UPDATE ' . $onUpdate . '
-            ' )->execute();
+            ' );
                 } catch( \Throwable $th ) {
                 }
             } elseif( $relationType === 'ManyToOne' ) {
@@ -117,7 +117,7 @@ class Relation extends AbstractAnalyze
                 ADD `' . $tableName . '_id` INT UNSIGNED NULL,
                 ADD KEY `fk_' . $tableName . '_' . $tableRelation . '` (`' . $tableName . '_id`),
                 ADD CONSTRAINT `c_' . $tableName . '_' . $tableRelation . '` FOREIGN KEY (`' . $tableName . '_id`) REFERENCES `' . $tableName . '` (`id`) ON DELETE ' . $onDelete . ' ON UPDATE ' . $onUpdate . '
-            ' )->execute();
+            ' );
                 } catch( \Throwable $th ) {
                 }
             }
@@ -133,7 +133,6 @@ class Relation extends AbstractAnalyze
         $statement = $this->driverHandler->getConnection()->query(
             'SELECT table_name FROM INFORMATION_SCHEMA.TABLES WHERE table_schema = "' . $database . '";'
         );
-        $statement->execute();
         
         foreach( $statement->fetchAll() as $data ) {
             if( !in_array( $data[0], $this->joinTables ) ) {
@@ -141,7 +140,7 @@ class Relation extends AbstractAnalyze
                 
                 try {
                     echo "Try to remove table " . $data[0] . "...";
-                    $this->driverHandler->getConnection()->query( $query )->execute();
+                    $this->driverHandler->getConnection()->query( $query );
                 } catch( \Throwable $th ) {
                 }
                 
@@ -156,7 +155,6 @@ class Relation extends AbstractAnalyze
         $statement = $this->driverHandler->getConnection()->query(
             'DESCRIBE `' . $tableName . '`;'
         );
-        $statement->execute();
         
         foreach( $statement->fetchAll() as $data ) {
             if( !in_array( $data[0], $this->joinColumn ) ) {
@@ -167,7 +165,7 @@ class Relation extends AbstractAnalyze
                 
                 try {
                     echo "Try to remove column " . $data[0] . "...";
-                    $this->driverHandler->getConnection()->query( $query )->execute();
+                    $this->driverHandler->getConnection()->query( $query );
                 } catch( \Throwable $e ) {
                 }
                 

@@ -80,18 +80,19 @@ class Column extends AbstractAnalyze
     {
         echo "Create column " . $config[CacheHandlerInterface::ENTITY_COLUMN_NAME] . "\n";
         
+        if($tableName === 'admin')
+            var_dump( $this->mustBePurged( $config[CacheHandlerInterface::ENTITY_IS_NULLABLE], $config[CacheHandlerInterface::ENTITY_COLUMN_TYPE], $config, $tableName ));
+        
         if( $this->mustBePurged( $config[CacheHandlerInterface::ENTITY_IS_NULLABLE], $config[CacheHandlerInterface::ENTITY_COLUMN_TYPE], $config, $tableName ) ) {
             
             try {
                 $statement = $this->driverHandler->getConnection()->query( 'DESCRIBE `' . $tableName . '`;' );
-                $statement->execute();
                 
                 $query = 'ALTER TABLE `' . $tableName . '` ' . "\n";
                 
                 $query .= 'DROP COLUMN `' . $config[CacheHandlerInterface::ENTITY_COLUMN_NAME] . '`;';
                 
                 $statement = $this->driverHandler->getConnection()->query( $query );
-                $statement->fetchAll();
             } catch( \Throwable $throwable ) {
             }
         }
@@ -111,7 +112,6 @@ class Column extends AbstractAnalyze
         try {
             
             $statement = $this->driverHandler->getConnection()->query( $query );
-            $statement->fetchAll();
         } catch( \Throwable $th ) {
             if( strpos( $th->getMessage(), 'Duplicate' ) === FALSE ) {
                 echo $th->getMessage() . "\n";
@@ -133,7 +133,6 @@ class Column extends AbstractAnalyze
     private function purgeColumns( array $config, string $tableName ): void
     {
         $statement = $this->driverHandler->getConnection()->query( 'DESCRIBE `' . $tableName . '`;' );
-        $statement->execute();
         
         foreach( $statement->fetchAll() as $data ) {
             if( !in_array( $data[0], $this->columns ) && !preg_match( '/.+_id/', $data[0] ) ) {
@@ -150,7 +149,7 @@ class Column extends AbstractAnalyze
                 $query .= 'DROP COLUMN `' . $data[0] . '`;';
                 
                 try {
-                    $this->driverHandler->getConnection()->query( $query )->execute();
+                    $this->driverHandler->getConnection()->query( $query );
                 } catch( \Throwable $throwable ) {
                     echo $throwable->getMessage() . "\n";
                 }
@@ -167,7 +166,6 @@ class Column extends AbstractAnalyze
         
         
         $statment = $this->driverHandler->getConnection()->query( 'DESCRIBE `' . $tableName . '`;' );
-        $statment->execute();
         
         $truncate = TRUE;
         
@@ -200,8 +198,8 @@ class Column extends AbstractAnalyze
                 $columnIndex = $config[CacheHandlerInterface::ENTITY_COLUMN_INDEX];
                 if( ( !empty( $item['Key'] ) && $columnIndex === NULL )
                     || ( empty( $item['Key'] ) && $columnIndex !== NULL )
-                    || ( !empty( $item['Key'] ) ? mb_strtolower( $item['Key'] ) : NULL ) !==
-                       ( empty( self::PREFIX_INDEX ) ? self::PREFIX_INDEX[$columnIndex] : NULL ) ) {
+                    || (!empty( $item['Key']) ? mb_strtolower( $item['Key']) : NULL) !==
+                       (self::PREFIX_INDEX[$columnIndex] ?? NULL) ) {
                     
                     break;
                 }

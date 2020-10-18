@@ -33,6 +33,6 @@ class Table extends AbstractAnalyze
                                      (
                                         `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
                                         PRIMARY KEY (`id`)
-                                     )ENGINE=InnoDB DEFAULT CHARSET=utf8;' )->execute();
+                                     )ENGINE=InnoDB DEFAULT CHARSET=utf8;' );
     }
 }

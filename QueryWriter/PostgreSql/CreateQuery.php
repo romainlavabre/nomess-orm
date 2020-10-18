@@ -40,7 +40,7 @@ class CreateQuery extends AbstractAlterData implements QueryCreateInterface
                                          ->prepare(
                                              self::QUERY_INSERT .
                                              $this->queryTable( $cache ) .
-                                             $this->queryColumn( $cache ) .
+                                             $this->queryColumn( $cache, $object ) .
                                              $this->queryParameters( $cache, $object ) . ';'
                                          );
         $this->bindValue( $statement, $object );
@@ -61,14 +61,26 @@ class CreateQuery extends AbstractAlterData implements QueryCreateInterface
      * @param array $cache
      * @return string
      */
-    private function queryColumn( array $cache ): string
+    private function queryColumn( array $cache, object $object): string
     {
         $line = ' (';
+        $isAddedToUpdate = FALSE;
         
         foreach( $cache[CacheHandlerInterface::ENTITY_METADATA] as $propertyName => $value ) {
             // Exclude relations
             if( $value[CacheHandlerInterface::ENTITY_RELATION] === NULL && $propertyName !== 'id' ) {
                 $line .= '"' . $value[CacheHandlerInterface::ENTITY_COLUMN_NAME] . '", ';
+            }else{
+                if($isAddedToUpdate){
+                    continue;
+                }
+    
+                $reflectionProperty = Store::getReflection( get_class($object), $propertyName);
+    
+                if($reflectionProperty->isInitialized($object) && !empty( $reflectionProperty->getValue($object))){
+                    Store::addToUpdate($object);
+                    $isAddedToUpdate = TRUE;
+                }
             }
         }
         

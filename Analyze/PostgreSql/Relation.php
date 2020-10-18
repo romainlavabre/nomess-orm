@@ -86,16 +86,13 @@ class Relation extends AbstractAnalyze
                                         CONSTRAINT UQ_' . $tableName . '_' . $tableJoin . ' UNIQUE ("' . $tableName . '_id","' . $tableRelation . '_id"),
                                         CONSTRAINT c_' . $tableName . '_' . $tableJoin . ' FOREIGN KEY ("' . $tableName . '_id") REFERENCES "' . $tableName . '" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
                                         CONSTRAINT c_' . $tableRelation . '_' . $tableJoin . ' FOREIGN KEY ("' . $tableRelation . '_id") REFERENCES "' . $tableRelation . '" ("id") ON DELETE CASCADE ON UPDATE CASCADE
-                                     );' )
-                                    ->execute();
+                                     );' );
     
                 $this->driverHandler->getConnection()
-                                    ->query( 'CREATE INDEX fk_' . $tableName . '_' . $tableJoin . ' ON "' . $tableJoin . '" ("' . $tableName . '_id");' )
-                                    ->execute();
+                                    ->query( 'CREATE INDEX fk_' . $tableName . '_' . $tableJoin . ' ON "' . $tableJoin . '" ("' . $tableName . '_id");' );
                 
                 $this->driverHandler->getConnection()
-                                    ->query( 'CREATE INDEX fk_' . $tableRelation . '_' . $tableJoin . ' ON "' . $tableJoin . '" ("' . $tableRelation . '_id")' )
-                                    ->execute();
+                                    ->query( 'CREATE INDEX fk_' . $tableRelation . '_' . $tableJoin . ' ON "' . $tableJoin . '" ("' . $tableRelation . '_id")' );
             } catch( \Throwable $th ) {
                 if(strpos( $th->getMessage(), 'Duplicate') === FALSE) {
                     echo $th->getMessage() . "\n";
@@ -119,12 +116,10 @@ class Relation extends AbstractAnalyze
                 ALTER TABLE "' . $tableName . '"
                 ADD COLUMN "' . $tableRelation . '_id" INT NULL,
                 ADD CONSTRAINT c_' . $tableRelation . '_' . $tableName . ' FOREIGN KEY ("' . $tableRelation . '_id") REFERENCES "' . $tableRelation . '" ("id") ON DELETE ' . $onDelete . ' ON UPDATE ' . $onUpdate . '
-            ' )
-                                        ->execute();
+            ' );
                     
                     $this->driverHandler->getConnection()
-                                        ->query( 'CREATE INDEX fk_' . $tableRelation . '_' . $tableName . ' ON "' . $tableName . '" ("' . $tableRelation . '_id");' )
-                                        ->execute();
+                                        ->query( 'CREATE INDEX fk_' . $tableRelation . '_' . $tableName . ' ON "' . $tableName . '" ("' . $tableRelation . '_id");' );
                 } catch( \Throwable $th ) {
                     if(strpos( $th->getMessage(), 'Duplicate') === FALSE) {
                         echo $th->getMessage() . "\n";
@@ -140,12 +135,11 @@ class Relation extends AbstractAnalyze
                 ALTER TABLE "' . $tableRelation . '"
                 ADD COLUMN "' . $tableName . '_id" INT NULL,
                 ADD CONSTRAINT c_' . $tableName . '_' . $tableRelation . ' FOREIGN KEY ("' . $tableName . '_id") REFERENCES "' . $tableName . '" ("id") ON DELETE ' . $onDelete . ' ON UPDATE ' . $onUpdate . '
-            ' )
-                                        ->execute();
+            ' );
                     
                     $this->driverHandler->getConnection()
-                                        ->query( 'CREATE INDEX fk_' . $tableName . '_' . $tableRelation . ' ON "' . $tableRelation . '" ("' . $tableName . '_id")' )
-                                        ->execute();
+                                        ->query( 'CREATE INDEX fk_' . $tableName . '_' . $tableRelation . ' ON "' . $tableRelation . '" ("' . $tableName . '_id")' );
+                                       
                 } catch( \Throwable $th ) {
                     if(strpos( $th->getMessage(), 'Duplicate') === FALSE) {
                         echo $th->getMessage() . "\n";
@@ -164,7 +158,6 @@ class Relation extends AbstractAnalyze
         $statement = $this->driverHandler->getConnection()->query(
             'SELECT table_name FROM INFORMATION_SCHEMA.TABLES WHERE table_schema = \'' . $database . '\';'
         );
-        $statement->execute();
         
         foreach( $statement->fetchAll() as $data ) {
             if( !in_array( $data[0], $this->joinTables ) ) {
@@ -172,7 +165,7 @@ class Relation extends AbstractAnalyze
                 
                 try {
                     echo "Try to remove table " . $data[0] . "...";
-                    $this->driverHandler->getConnection()->query( $query )->execute();
+                    $this->driverHandler->getConnection()->query( $query );
                 } catch( \Throwable $th ) {
                 }
                 
@@ -185,7 +178,6 @@ class Relation extends AbstractAnalyze
     private function purgeForeignKey( string $tableName, array $config ): void
     {
         $statement = $this->driverHandler->getConnection()->query( 'SELECT * FROM information_schema.columns WHERE table_name = \'' . $tableName . '\';' );
-        $statement->execute();
         
         foreach( $statement->fetchAll() as $data ) {
             if( !in_array( $data['column_name'], $this->joinColumn ) ) {
@@ -195,8 +187,8 @@ class Relation extends AbstractAnalyze
                 
                 try {
                     echo "Try to remove column " . $data['column_name'] . "...";
-                    $this->driverHandler->getConnection()->query( 'DROP INDEX fk_' . str_replace( '_id', '', $data['column_name'] ) . '_' . $tableName . ';' )->execute();
-                    $this->driverHandler->getConnection()->query( $query )->execute();
+                    $this->driverHandler->getConnection()->query( 'DROP INDEX fk_' . str_replace( '_id', '', $data['column_name'] ) . '_' . $tableName . ';' );
+                    $this->driverHandler->getConnection()->query( $query );
                 } catch( \Throwable $e ) {
                 }
                 

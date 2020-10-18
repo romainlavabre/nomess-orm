@@ -33,6 +33,6 @@ class Table extends AbstractAnalyze
                                      (
                                         "id" SERIAL,
                                         PRIMARY KEY ("id")
-                                     );' )->execute();
+                                     );' );
     }
 }

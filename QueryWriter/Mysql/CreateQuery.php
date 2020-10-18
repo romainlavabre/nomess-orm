@@ -40,7 +40,7 @@ class CreateQuery extends AbstractAlterData implements QueryCreateInterface
                                          ->prepare(
                                              self::QUERY_INSERT .
                                              $this->queryTable( $cache ) .
-                                             $this->queryColumn( $cache ) .
+                                             $this->queryColumn( $cache, $object ) .
                                              $this->queryParameters( $cache ) . ';'
                                          );
         $this->bindValue( $statement, $object );
@@ -61,7 +61,7 @@ class CreateQuery extends AbstractAlterData implements QueryCreateInterface
      * @param array $cache
      * @return string
      */
-    private function queryColumn( array $cache ): string
+    private function queryColumn( array $cache, object $object ): string
     {
         $line = ' (';
         $isAddedToUpdate = FALSE;

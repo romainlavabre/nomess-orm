@@ -123,7 +123,6 @@ class Column extends AbstractAnalyze
     private function purgeColumns( array $config, string $tableName ): void
     {
         $statement = $this->driverHandler->getConnection()->query( 'SELECT * FROM information_schema.columns WHERE table_name = \'' . $tableName . '\'' );
-        $statement->execute();
         
         foreach( $statement->fetchAll() as $data ) {
             if( !in_array( $data['column_name'], $this->columns ) && !preg_match( '/.+_id/', $data['column_name'] ) ) {
