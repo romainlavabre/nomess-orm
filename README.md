@@ -3,6 +3,9 @@
 
 nomess / orm is a very powerful orm requiring little configuration.
 
+!!! This project is no longer maintained
+
+
 It supports Mysql and PostgreSql.
 
 ### Methods:
